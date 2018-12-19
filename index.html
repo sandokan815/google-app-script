@@ -1,0 +1,516 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <base target="_top">
+    <style type="text/css">
+    .window1 {
+		border-style: ridge;
+		height: 585px;
+		width: 970px;
+		overflow-y: scroll;
+		display: flex;
+		flex-wrap: wrap;
+		margin: 1% 10%;
+        background: white;
+	}
+    .window {
+		border-style: ridge;
+		height: 585px;
+		width: 970px;
+		overflow-y: scroll;
+		margin: 1% 10%;
+        background: white;
+	}
+	.flex-container {
+		display: flex;
+		flex-direction: column;
+		margin: 9px;
+		text-align: left;
+	}
+	img {
+		width: 220px;
+		height: 165px;
+		margin-bottom: 20px;
+	}
+    .print-button {
+      width: 1020px;
+      text-align: right;
+    }
+    button {
+      background: #0095ff;
+      border-color: #07c;
+      width: 90px;
+      height: 30px;
+      color: white;
+      border-radius: 3px;
+      font-weight: bold;
+      cursor: pointer;
+    }
+    button:hover {
+      background: #07c;
+    }
+    table th, td {
+		border: 1px solid black;
+		border-collapse: collapse;
+	}
+    table {
+      width: 100%;
+    }
+	th {
+		width: 14.3%;
+	}
+    h1 {
+      color: white;
+      margin-bottom: 0px;
+    }
+    @media print {
+	  body * {
+	    visibility: hidden;
+	  }
+	}
+    </style>
+  </head>
+  <body style="background: #d9d9d9;"><?
+    var dataForCurrent = getDataSortName();
+    var dataForNew = getDataSortDate();
+    ?>
+    <div id="new_start" align="center">
+			<h1>New Start Roster</h1><?
+      var first = new Date();
+      first.setHours(0,0,0,0);
+			var last = new Date(first.getTime() + 8 * 24 * 60 * 60 * 1000); ?>
+            <h2>For<?= Utilities.formatDate(first, "CST", "EEEE, MMM dd")?> - <?= Utilities.formatDate(last, "CST", "EEEE, MMM dd")?></h2>
+			<div class="window1"><?
+				for (var i = 0; i < dataForNew.length; i++) {
+                var start = new Date(new Date(dataForNew[i][6]).getTime() + 2 * 60 * 60 * 1000);
+					if (start >= first && start < last) {?>
+						<div class="flex-container">
+							<img src="<?= dataForNew[i][8].replace("open", "uc");?>" >
+							<label style="font-weight: bold;"> Start Date : <?= Utilities.formatDate(dataForNew[i][6], "CST", "EEEE, MMM dd") ?></label>
+							<label> Name: <?= dataForNew[i][1] + ' ' + dataForNew[i][2] ?></label>
+							<label> Shift: <?= dataForNew[i][4] ?></label>
+							<label> Dept: <?= dataForNew[i][3] ?></label>
+						</div> <?
+					}
+				} ?>
+			</div>
+    </div>
+    <div align="center">
+      <h1>Current Roster - Roll Fed</h1>
+      <div class="print-button">
+        <button onclick="htmlToPDF('roll_fed')">Print</button>
+      </div>
+      
+      <div class="window">
+      	<div id="roll_fed">
+          <div style="display: flex; flex-direction: column; width: 100%;" align="center">
+            <label style="background: orange; font-size: 25px;">Roll Fed</label>
+            <label style="font-size: 25px;">Week of: <?= Utilities.formatDate(firstOfWeek(), "CST", "MM/dd/YY") ?></label>
+          </div>
+          <table style="border: 1px solid black; border-collapse: collapse; width: 100%;">
+            <tr>
+              <th>Monday</th>	
+              <th>Tuesday</th>
+              <th>Wednesday</th>
+              <th>Thursday</th>	
+              <th>Friday</th>
+              <th>Saturday</th>
+              <th>Sunday</th>
+            </tr>
+            <tr><? var week = getWeek();
+              for (var i in week) { ?>
+                <th><?= Utilities.formatDate(week[i], "CST", "MM/dd/YY") ?></th><?
+              } ?>
+            </tr>
+            <tr style="background: lightgray;">
+            <? var crew = detectCrew(new Date());
+              if (crew == "A_C") { ?>
+                <th>A crew</th>
+                <th>A crew</th>
+                <th>B crew</th>
+                <th>B crew</th>
+                <th>A crew</th>
+                <th>A crew</th>
+                <th>A crew</th>
+            <? } if (crew == "B_D") { ?>
+                <th>B crew</th>
+                <th>B crew</th>
+                <th>A crew</th>
+                <th>A crew</th>
+                <th>B crew</th>
+                <th>B crew</th>
+                <th>B crew</th>
+            <? } ?>
+            </tr><?
+              var persons = make_persons(crew, "Roll Fed", week, dataForCurrent, "first");
+              var max_length = get_max_length(persons);
+              var table = create_table(persons, max_length);
+              for (var i = 0; i < max_length; i++) {?>
+                <tr><?
+                for (var j = 0; j < 7; j++) {
+                  if (table[i][j] && table[i][j].indexOf("yellow")>-1) {?>
+                    <td style="text-align: center; background: yellow;"><?=table[i][j].slice(0, -6); ?></td><?
+                  } else {?>
+                    <td style="text-align: center;"><?=table[i][j]; ?></td><?
+                  }
+                }?>
+                </tr><?
+              }?>
+          </table>
+          <table style="border: 1px solid black; border-collapse: collapse; width: 100%; margin-top: 8%;">
+            <tr style="background: lightgray;">
+            <? if (crew == "A_C") { ?>
+              <th>C crew</th>
+              <th>C crew</th>
+              <th>D crew</th>
+              <th>D crew</th>
+              <th>C crew</th>
+              <th>C crew</th>
+              <th>C crew</th>
+            <? } if (crew == "B_D") { ?>
+              <th>D crew</th>
+              <th>D crew</th>
+              <th>C crew</th>
+              <th>C crew</th>
+              <th>D crew</th>
+              <th>D crew</th>
+              <th>D crew</th>
+            <? } ?>
+            </tr><?
+              var persons = make_persons(crew, "Roll Fed", week, dataForCurrent, "second");
+              var max_length = get_max_length(persons);
+              var table = create_table(persons, max_length);
+              for (var i = 0; i < max_length; i++) {?>
+                <tr><?
+                for (var j = 0; j < 7; j++) {
+                  if (table[i][j] && table[i][j].indexOf("yellow")>-1) {?>
+                    <td style="text-align: center; background: yellow;"><?=table[i][j].slice(0, -6); ?></td><?
+                  } else {?>
+                    <td style="text-align: center;"><?=table[i][j]; ?></td><?
+                  }
+                }?>
+                </tr><?
+              }?>
+          </table>
+	    </div>	
+      </div>
+    </div>
+    <div align="center">
+      <h1>Current Roster - Inline</h1>
+      <div class="print-button">
+        <button onclick="htmlToPDF('inline')">Print</button>
+      </div>
+      <div class="window">
+      	<div id="inline">
+          <div style="display: flex; flex-direction: column; width: 100%;" align="center">
+            <label style="background: green; font-size: 25px;">Inline</label>
+            <label style="font-size: 25px;">Week of: <?= Utilities.formatDate(firstOfWeek(), "CST", "MM/dd/YY") ?></label>
+          </div>
+          <table style="border: 1px solid black; border-collapse: collapse; width: 100%;">
+            <tr>
+              <th>Monday</th>	
+              <th>Tuesday</th>
+              <th>Wednesday</th>
+              <th>Thursday</th>	
+              <th>Friday</th>
+              <th>Saturday</th>
+              <th>Sunday</th>
+            </tr>
+            <tr><? week = getWeek();
+              for (var i in week) { ?>
+                <th><?= Utilities.formatDate(week[i], "CST", "MM/dd/YY") ?></th><?
+              } ?>
+            </tr>
+            <tr style="background: lightgray;">
+            <? var crew = detectCrew(new Date());
+              if (crew == "A_C") { ?>
+                <th>A crew</th>
+                <th>A crew</th>
+                <th>B crew</th>
+                <th>B crew</th>
+                <th>A crew</th>
+                <th>A crew</th>
+                <th>A crew</th>
+            <? } else { ?>
+                <th>B crew</th>
+                <th>B crew</th>
+                <th>A crew</th>
+                <th>A crew</th>
+                <th>B crew</th>
+                <th>B crew</th>
+                <th>B crew</th>
+            <? } ?>
+            </tr><?
+              var persons = make_persons(crew, "Inline", week, dataForCurrent, "first");
+              var max_length = get_max_length(persons);
+              var table = create_table(persons, max_length);
+              for (var i = 0; i < max_length; i++) {?>
+                <tr><?
+                for (var j = 0; j < 7; j++) {
+                  if (table[i][j] && table[i][j].indexOf("yellow")>-1) {?>
+                    <td style="text-align: center; background: yellow;"><?=table[i][j].slice(0, -6); ?></td><?
+                  } else {?>
+                    <td style="text-align: center;"><?=table[i][j]; ?></td><?
+                  }
+                }?>
+                </tr><?
+              }?>
+          </table>
+          <table style="border: 1px solid black; border-collapse: collapse; width: 100%; margin-top: 8%;">
+            <tr style="background: lightgray;">
+              <? var crew = detectCrew(new Date());
+              if (crew == "A_C") { ?>
+                <th>C crew</th>
+                <th>C crew</th>
+                <th>D crew</th>
+                <th>D crew</th>
+                <th>C crew</th>
+                <th>C crew</th>
+                <th>C crew</th>
+              <? } else { ?>
+                <th>D crew</th>
+                <th>D crew</th>
+                <th>C crew</th>
+                <th>C crew</th>
+                <th>D crew</th>
+                <th>D crew</th>
+                <th>D crew</th>
+              <? } ?>
+            </tr><?
+              var persons = make_persons(crew, "Inline", week, dataForCurrent, "second");
+              var max_length = get_max_length(persons);
+              var table = create_table(persons, max_length);
+              for (var i = 0; i < max_length; i++) {?>
+                <tr><?
+                for (var j = 0; j < 7; j++) {
+                  if (table[i][j] && table[i][j].indexOf("yellow")>-1) {?>
+                    <td style="text-align: center; background: yellow;"><?=table[i][j].slice(0, -6); ?></td><?
+                  } else {?>
+                    <td style="text-align: center;"><?=table[i][j]; ?></td><?
+                  }
+                }?>
+                </tr><?
+              }?>
+          </table>          
+	    </div>
+      </div>
+    </div>
+    <div align="center">
+      <h1>Current Roster - Eco Star</h1>
+      <div class="print-button">
+        <button onclick="htmlToPDF('eco_star')">Print</button>
+      </div>
+      
+      <div class="window">
+      	<div id="eco_star">
+          <div style="display: flex; flex-direction: column; width: 100%;" align="center">
+            <label style="background: cyan; font-size: 25px;">Eco Star</label>
+            <label style="font-size: 25px;">Week of: <?= Utilities.formatDate(firstOfWeek(), "CST", "MM/dd/YY") ?></label>
+          </div>
+          <table style="border: 1px solid black; border-collapse: collapse; width: 100%;">
+            <tr>
+              <th>Monday</th>	
+              <th>Tuesday</th>
+              <th>Wednesday</th>
+              <th>Thursday</th>	
+              <th>Friday</th>
+              <th>Saturday</th>
+              <th>Sunday</th>
+            </tr>
+            <tr><? var week = getWeek();
+              for (var i in week) { ?>
+                <th><?= Utilities.formatDate(week[i], "CST", "MM/dd/YY") ?></th><?
+              } ?>
+            </tr>
+            <tr style="background: lightgray;">
+            <? var crew = detectCrew(new Date());
+              if (crew == "A_C") { ?>
+                <th>A crew</th>
+                <th>A crew</th>
+                <th>B crew</th>
+                <th>B crew</th>
+                <th>A crew</th>
+                <th>A crew</th>
+                <th>A crew</th>
+            <? } if (crew == "B_D") { ?>
+                <th>B crew</th>
+                <th>B crew</th>
+                <th>A crew</th>
+                <th>A crew</th>
+                <th>B crew</th>
+                <th>B crew</th>
+                <th>B crew</th>
+            <? } ?>
+            </tr><?
+              var persons = make_persons(crew, "Eco Star", week, dataForCurrent, "first");
+              var max_length = get_max_length(persons);
+              var table = create_table(persons, max_length);
+              for (var i = 0; i < max_length; i++) {?>
+                <tr><?
+                for (var j = 0; j < 7; j++) {
+                  if (table[i][j] && table[i][j].indexOf("yellow")>-1) {?>
+                    <td style="text-align: center; background: yellow;"><?=table[i][j].slice(0, -6); ?></td><?
+                  } else {?>
+                    <td style="text-align: center;"><?=table[i][j]; ?></td><?
+                  }
+                }?>
+                </tr><?
+              }?>
+          </table>
+          <table style="border: 1px solid black; border-collapse: collapse; width: 100%; margin-top: 8%;">
+            <tr style="background: lightgray;">
+            <? if (crew == "A_C") { ?>
+              <th>C crew</th>
+              <th>C crew</th>
+              <th>D crew</th>
+              <th>D crew</th>
+              <th>C crew</th>
+              <th>C crew</th>
+              <th>C crew</th>
+            <? } if (crew == "B_D") { ?>
+              <th>D crew</th>
+              <th>D crew</th>
+              <th>C crew</th>
+              <th>C crew</th>
+              <th>D crew</th>
+              <th>D crew</th>
+              <th>D crew</th>
+            <? } ?>
+            </tr><?
+              var persons = make_persons(crew, "Eco Star", week, dataForCurrent, "second");
+              var max_length = get_max_length(persons);
+              var table = create_table(persons, max_length);
+              for (var i = 0; i < max_length; i++) {?>
+                <tr><?
+                for (var j = 0; j < 7; j++) {
+                  if (table[i][j] && table[i][j].indexOf("yellow")>-1) {?>
+                    <td style="text-align: center; background: yellow;"><?=table[i][j].slice(0, -6); ?></td><?
+                  } else {?>
+                    <td style="text-align: center;"><?=table[i][j]; ?></td><?
+                  }
+                }?>
+                </tr><?
+              }?>
+          </table>
+	      </div>	
+      </div>
+    </div>
+    <div align="center">
+      <h1>Current Roster - North Plant</h1>
+      <div class="print-button">
+        <button onclick="htmlToPDF('north_plant')">Print</button>
+      </div>
+      
+      <div class="window">
+      	<div id="north_plant">
+          <div style="display: flex; flex-direction: column; width: 100%;" align="center">
+            <label style="background: yellow; font-size: 25px;">North Plant</label>
+            <label style="font-size: 25px;">Week of: <?= Utilities.formatDate(firstOfWeek(), "CST", "MM/dd/YY") ?></label>
+          </div>
+          <table style="border: 1px solid black; border-collapse: collapse; width: 100%;">
+            <tr>
+              <th>Monday</th>	
+              <th>Tuesday</th>
+              <th>Wednesday</th>
+              <th>Thursday</th>	
+              <th>Friday</th>
+              <th>Saturday</th>
+              <th>Sunday</th>
+            </tr>
+            <tr><? var week = getWeek();
+              for (var i in week) { ?>
+                <th><?= Utilities.formatDate(week[i], "CST", "MM/dd/YY") ?></th><?
+              } ?>
+            </tr>
+            <tr style="background: lightgray;">
+            <? var crew = detectCrew(new Date());
+              if (crew == "A_C") { ?>
+                <th>A crew</th>
+                <th>A crew</th>
+                <th>B crew</th>
+                <th>B crew</th>
+                <th>A crew</th>
+                <th>A crew</th>
+                <th>A crew</th>
+            <? } if (crew == "B_D") { ?>
+                <th>B crew</th>
+                <th>B crew</th>
+                <th>A crew</th>
+                <th>A crew</th>
+                <th>B crew</th>
+                <th>B crew</th>
+                <th>B crew</th>
+            <? } ?>
+            </tr><?
+              var persons = make_persons(crew, "North Plant", week, dataForCurrent, "first");
+              var max_length = get_max_length(persons);
+              var table = create_table(persons, max_length);
+              for (var i = 0; i < max_length; i++) {?>
+                <tr><?
+                for (var j = 0; j < 7; j++) {
+                  if (table[i][j] && table[i][j].indexOf("yellow")>-1) {?>
+                    <td style="text-align: center; background: yellow;"><?=table[i][j].slice(0, -6); ?></td><?
+                  } else {?>
+                    <td style="text-align: center;"><?=table[i][j]; ?></td><?
+                  }
+                }?>
+                </tr><?
+              }?>
+          </table>
+          <table style="border: 1px solid black; border-collapse: collapse; width: 100%; margin-top: 8%;">
+            <tr style="background: lightgray;">
+            <? if (crew == "A_C") { ?>
+              <th>C crew</th>
+              <th>C crew</th>
+              <th>D crew</th>
+              <th>D crew</th>
+              <th>C crew</th>
+              <th>C crew</th>
+              <th>C crew</th>
+            <? } if (crew == "B_D") { ?>
+              <th>D crew</th>
+              <th>D crew</th>
+              <th>C crew</th>
+              <th>C crew</th>
+              <th>D crew</th>
+              <th>D crew</th>
+              <th>D crew</th>
+            <? } ?>
+            </tr><?
+              var persons = make_persons(crew, "North Plant", week, dataForCurrent, "second");
+              var max_length = get_max_length(persons);
+              var table = create_table(persons, max_length);
+              for (var i = 0; i < max_length; i++) {?>
+                <tr><?
+                for (var j = 0; j < 7; j++) {
+                  if (table[i][j] && table[i][j].indexOf("yellow")>-1) {?>
+                    <td style="text-align: center; background: yellow;"><?=table[i][j].slice(0, -6); ?></td><?
+                  } else {?>
+                    <td style="text-align: center;"><?=table[i][j]; ?></td><?
+                  }
+                }?>
+                </tr><?
+              }?>
+          </table>
+	      </div>	
+      </div>
+    </div>
+    <iframe name="print_frame" width="0" height="0" frameborder="0" src="about:blank"></iframe>
+  </body>
+  <script>
+    function htmlToPDF(id) {
+      var htmlToPrint = '' +
+        '<style type="text/css">' +
+        'table th, td {' + 
+        'border: 1px solid black; border-collapse: collapse' +
+        '}' +
+        'table { width: 100%; }'+
+        'th { width: 14.3%;}'+
+        '</style>';
+      htmlToPrint += document.getElementById(id).outerHTML;
+      window.frames['print_frame'].document.body.innerHTML = htmlToPrint;
+      window.frames["print_frame"].window.focus();
+      window.frames["print_frame"].window.print();
+    }
+  </script>
+</html>
