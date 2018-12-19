@@ -4,11 +4,13 @@
       .setXFrameOptionsMode(HtmlService.XFrameOptionsMode.ALLOWALL);
   }
 
-  function include(filename) {
-    return HtmlService.createHtmlOutputFromFile(filename)
-      .getContent();
-  }
+  function openDialog() {
+    var html = HtmlService.createTemplateFromFile('roll_fed_next_week.html')
+      .evaluate()
+      .setSandboxMode(HtmlService.SandboxMode.IFRAME).setHeight(500);
 
+    SpreadsheetApp.getUi().showModalDialog(html, 'Dialog title');
+  }
   function getDataSortDate() {
     return SpreadsheetApp
       .openById('1-HmBSO0ViOWjC4ttaAxOZ1sygnfWmKvMJBswBRyouQA')
@@ -35,15 +37,16 @@
       return "B_D";
     }
   }
-  function firstOfWeek() {
+  function firstOfWeek(diff) {
     var now = new Date();
     var today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
-    var monday = new Date(today.setDate(today.getDate()-today.getDay()+1));
+    var monday = new Date(today.setDate(today.getDate()-today.getDay() + diff));
     return monday;
   }
-  function getWeek() {
+  
+  function getWeek(diff) {
     var curr = new Date();
-    var first = curr.getDate() - curr.getDay() + 1;
+    var first = curr.getDate() - curr.getDay() + diff;
     var week = [];
     for (var i = 0; i < 7; i++) {
       var next = new Date(curr.getTime());
@@ -53,6 +56,7 @@
     }
     return week;
   }
+  
   function filtered_person(dept, crew, date, data) {
     var person = [];
     for (var i = 0; i < data.length; i++) {
