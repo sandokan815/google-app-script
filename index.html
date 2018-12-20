@@ -67,6 +67,9 @@
 		width: 14.3%;
     text-align: center;
 	}
+    td {
+      height: 25px;
+    }
     h1 {
       color: white;
       margin-bottom: 0px;
@@ -86,11 +89,48 @@
     .northPlant {
       top: 81%;
     }
+    .full {
+      border: 2px solid red;
+    }
+    .top {
+      border-top: 2px solid red;
+      border-left: 2px solid red;
+      border-right: 2px solid red;
+    }
+    .medium {
+      border-left: 2px solid red;
+      border-right: 2px solid red;
+    }
+    .bottom {
+      border-bottom: 2px solid red;
+      border-left: 2px solid red;
+      border-right: 2px solid red;
+    }
 </style>
   </head>
   <body style="background: #d9d9d9;"><?
     var dataForCurrent = getDataSortName();
     var dataForNew = getDataSortDate();
+    var totalSlots = getTotalSlots();
+    var length = get_length(totalSlots);
+    var crew = detectCrew(new Date());
+    var nextToday = new Date();
+    nextToday.setDate(nextToday.getDate() + 7);
+    var nextCrew = detectCrew(nextToday);
+    if (crew == "A_C") {
+      var a_c = [0, 1, 4, 5, 6];
+      var b_d = [2, 3];
+    } else if (crew == "B_D") {
+      var a_c = [2, 3];
+      var b_d = [0, 1, 4, 5, 6];
+    }
+    if (nextCrew == "A_C") {
+      var next_a_c = [0, 1, 4, 5, 6];
+      var next_b_d = [2, 3];
+    } else if (nextCrew == "B_D") {
+      var next_a_c = [2, 3];
+      var next_b_d = [0, 1, 4, 5, 6];
+    }
     ?>
     <div id="new_start" align="center">
 			<h1>New Start Roster</h1><?
@@ -142,8 +182,7 @@
               } ?>
             </tr>
             <tr style="background: lightgray;">
-            <? var crew = detectCrew(new Date());
-              if (crew == "A_C") { ?>
+            <? if (crew == "A_C") {?>
                 <th>A crew</th>
                 <th>A crew</th>
                 <th>B crew</th>
@@ -162,15 +201,16 @@
             <? } ?>
             </tr><?
               var persons = make_persons(crew, "Roll Fed", week, dataForCurrent, "first");
-              var max_length = get_max_length(persons);
-              var table = create_table(persons, max_length);
-              for (var i = 0; i < max_length; i++) {?>
+              var table = create_table(persons, length.rollFedCurAB);
+              for (var i = 0; i < length.rollFedCurAB; i++) { ?>
                 <tr><?
                 for (var j = 0; j < 7; j++) {
-                  if (table[i][j] && table[i][j].indexOf("yellow") > -1) {?>
-                    <td style="text-align: center; background: yellow;"><?=table[i][j].slice(0, -6); ?></td><?
+                var className = makeClassName(i, j, a_c, b_d, "first", totalSlots[0][9], totalSlots[1][9], totalSlots[2][9], totalSlots[3][9]);
+                  if (table[i][j] && table[i][j].indexOf("yellow") > -1) {
+                    ?>
+                    <td class="<?=className; ?>" style="text-align: center; background: yellow;"><?=table[i][j].slice(0, -6); ?></td><?
                   } else {?>
-                    <td style="text-align: center;"><?=table[i][j]; ?></td><?
+                    <td class="<?=className; ?>" style="text-align: center;"><?=table[i][j]; ?></td><?
                   }
                 }?>
                 </tr><?
@@ -197,15 +237,16 @@
             <? } ?>
             </tr><?
               var persons = make_persons(crew, "Roll Fed", week, dataForCurrent, "second");
-              var max_length = get_max_length(persons);
-              var table = create_table(persons, max_length);
-              for (var i = 0; i < max_length; i++) {?>
+              var table = create_table(persons, length.rollFedCurCD);
+              for (var i = 0; i < length.rollFedCurCD; i++) {?>
                 <tr><?
                 for (var j = 0; j < 7; j++) {
-                  if (table[i][j] && table[i][j].indexOf("yellow")>-1) {?>
-                    <td style="text-align: center; background: yellow;"><?=table[i][j].slice(0, -6); ?></td><?
+                  var className = makeClassName(i, j, a_c, b_d, "second", totalSlots[0][9], totalSlots[1][9], totalSlots[2][9], totalSlots[3][9]);
+                  if (table[i][j] && table[i][j].indexOf("yellow") > -1) {
+                    ?>
+                    <td class="<?=className; ?>" style="text-align: center; background: yellow;"><?=table[i][j].slice(0, -6); ?></td><?
                   } else {?>
-                    <td style="text-align: center;"><?=table[i][j]; ?></td><?
+                    <td class="<?=className; ?>" style="text-align: center;"><?=table[i][j]; ?></td><?
                   }
                 }?>
                 </tr><?
@@ -238,10 +279,7 @@
                     } ?>
                   </tr>
                   <tr style="background: lightgray;"><? 
-                    var nextToday = new Date();
-                    nextToday.setDate(nextToday.getDate() + 7);
-                    var crew = detectCrew(nextToday);
-                    if (crew == "A_C") { ?>
+                    if (nextCrew == "A_C") { ?>
                       <th>A crew</th>
                       <th>A crew</th>
                       <th>B crew</th>
@@ -259,16 +297,17 @@
                       <th>B crew</th>
                   <? } ?>
                   </tr><?
-                    var persons = make_persons(crew, "Roll Fed", week, dataForCurrent, "first");
-                    var max_length = get_max_length(persons);
-                    var table = create_table(persons, max_length);
-                    for (var i = 0; i < max_length; i++) {?>
+                    var persons = make_persons(nextCrew, "Roll Fed", week, dataForCurrent, "first");
+                    var table = create_table(persons, length.rollFedNextAB);
+                    for (var i = 0; i < length.rollFedNextAB; i++) {?>
                       <tr><?
                       for (var j = 0; j < 7; j++) {
-                        if (table[i][j] && table[i][j].indexOf("yellow")>-1) {?>
-                          <td style="text-align: center; background: yellow;"><?=table[i][j].slice(0, -6); ?></td><?
+                        var className = makeClassName(i, j, next_a_c, next_b_d, "first", totalSlots[0][11], totalSlots[1][11], totalSlots[2][11], totalSlots[3][11]);
+                        if (table[i][j] && table[i][j].indexOf("yellow") > -1) {
+                          ?>
+                          <td class="<?=className; ?>" style="text-align: center; background: yellow;"><?=table[i][j].slice(0, -6); ?></td><?
                         } else {?>
-                          <td style="text-align: center;"><?=table[i][j]; ?></td><?
+                          <td class="<?=className; ?>" style="text-align: center;"><?=table[i][j]; ?></td><?
                         }
                       }?>
                       </tr><?
@@ -276,8 +315,7 @@
                 </table>
                 <table style="border: 1px solid black; border-collapse: collapse; width: 100%; margin-top: 8%;">
                   <tr style="background: lightgray;">
-                    <? var crew = detectCrew(nextToday);
-                    if (crew == "A_C") { ?>
+                    <?if (nextCrew == "A_C") { ?>
                       <th>C crew</th>
                       <th>C crew</th>
                       <th>D crew</th>
@@ -295,16 +333,17 @@
                       <th>D crew</th>
                     <? } ?>
                   </tr><?
-                    var persons = make_persons(crew, "Roll Fed", week, dataForCurrent, "second");
-                    var max_length = get_max_length(persons);
-                    var table = create_table(persons, max_length);
-                    for (var i = 0; i < max_length; i++) {?>
+                    var persons = make_persons(nextCrew, "Roll Fed", week, dataForCurrent, "second");
+                    var table = create_table(persons, length.rollFedNextCD);
+                    for (var i = 0; i < length.rollFedNextCD; i++) {?>
                       <tr><?
                       for (var j = 0; j < 7; j++) {
-                        if (table[i][j] && table[i][j].indexOf("yellow")>-1) {?>
-                          <td style="text-align: center; background: yellow;"><?=table[i][j].slice(0, -6); ?></td><?
+                        var className = makeClassName(i, j, next_a_c, next_b_d, "second", totalSlots[0][11], totalSlots[1][11], totalSlots[2][11], totalSlots[3][11]);
+                        if (table[i][j] && table[i][j].indexOf("yellow") > -1) {
+                          ?>
+                          <td class="<?=className; ?>" style="text-align: center; background: yellow;"><?=table[i][j].slice(0, -6); ?></td><?
                         } else {?>
-                          <td style="text-align: center;"><?=table[i][j]; ?></td><?
+                          <td class="<?=className; ?>" style="text-align: center;"><?=table[i][j]; ?></td><?
                         }
                       }?>
                       </tr><?
@@ -345,8 +384,7 @@
               } ?>
             </tr>
             <tr style="background: lightgray;">
-            <? var crew = detectCrew(new Date());
-              if (crew == "A_C") { ?>
+            <?  if (crew == "A_C") { ?>
                 <th>A crew</th>
                 <th>A crew</th>
                 <th>B crew</th>
@@ -365,15 +403,16 @@
             <? } ?>
             </tr><?
               var persons = make_persons(crew, "Inline", week, dataForCurrent, "first");
-              var max_length = get_max_length(persons);
-              var table = create_table(persons, max_length);
-              for (var i = 0; i < max_length; i++) {?>
+              var table = create_table(persons, length.inlineCurAB);
+              for (var i = 0; i < length.inlineCurAB; i++) {?>
                 <tr><?
                 for (var j = 0; j < 7; j++) {
-                  if (table[i][j] && table[i][j].indexOf("yellow")>-1) {?>
-                    <td style="text-align: center; background: yellow;"><?=table[i][j].slice(0, -6); ?></td><?
+                  var className = makeClassName(i, j, a_c, b_d, "first", totalSlots[0][2], totalSlots[1][2], totalSlots[2][2], totalSlots[3][2]);
+                  if (table[i][j] && table[i][j].indexOf("yellow") > -1) {
+                    ?>
+                    <td class="<?=className; ?>" style="text-align: center; background: yellow;"><?=table[i][j].slice(0, -6); ?></td><?
                   } else {?>
-                    <td style="text-align: center;"><?=table[i][j]; ?></td><?
+                    <td class="<?=className; ?>" style="text-align: center;"><?=table[i][j]; ?></td><?
                   }
                 }?>
                 </tr><?
@@ -381,8 +420,7 @@
           </table>
           <table style="border: 1px solid black; border-collapse: collapse; width: 100%; margin-top: 8%;">
             <tr style="background: lightgray;">
-              <? var crew = detectCrew(new Date());
-              if (crew == "A_C") { ?>
+              <? if (crew == "A_C") { ?>
                 <th>C crew</th>
                 <th>C crew</th>
                 <th>D crew</th>
@@ -401,15 +439,16 @@
               <? } ?>
             </tr><?
               var persons = make_persons(crew, "Inline", week, dataForCurrent, "second");
-              var max_length = get_max_length(persons);
-              var table = create_table(persons, max_length);
-              for (var i = 0; i < max_length; i++) {?>
+              var table = create_table(persons, length.inlineCurCD);
+              for (var i = 0; i < length.inlineCurCD; i++) {?>
                 <tr><?
                 for (var j = 0; j < 7; j++) {
-                  if (table[i][j] && table[i][j].indexOf("yellow")>-1) {?>
-                    <td style="text-align: center; background: yellow;"><?=table[i][j].slice(0, -6); ?></td><?
+                  var className = makeClassName(i, j, a_c, b_d, "second", totalSlots[0][2], totalSlots[1][2], totalSlots[2][2], totalSlots[3][2]);
+                  if (table[i][j] && table[i][j].indexOf("yellow") > -1) {
+                    ?>
+                    <td class="<?=className; ?>" style="text-align: center; background: yellow;"><?=table[i][j].slice(0, -6); ?></td><?
                   } else {?>
-                    <td style="text-align: center;"><?=table[i][j]; ?></td><?
+                    <td class="<?=className; ?>" style="text-align: center;"><?=table[i][j]; ?></td><?
                   }
                 }?>
                 </tr><?
@@ -442,10 +481,7 @@
                       } ?>
                     </tr>
                     <tr style="background: lightgray;"><? 
-                      var nextToday = new Date();
-                      nextToday.setDate(nextToday.getDate() + 7);
-                      var crew = detectCrew(nextToday);
-                      if (crew == "A_C") { ?>
+                      if (nextCrew == "A_C") { ?>
                         <th>A crew</th>
                         <th>A crew</th>
                         <th>B crew</th>
@@ -463,16 +499,17 @@
                         <th>B crew</th>
                     <? } ?>
                     </tr><?
-                      var persons = make_persons(crew, "Inline", week, dataForCurrent, "first");
-                      var max_length = get_max_length(persons);
-                      var table = create_table(persons, max_length);
-                      for (var i = 0; i < max_length; i++) {?>
+                      var persons = make_persons(nextCrew, "Inline", week, dataForCurrent, "first");
+                      var table = create_table(persons, length.inlineNextAB);
+                      for (var i = 0; i < length.inlineNextAB; i++) {?>
                         <tr><?
                         for (var j = 0; j < 7; j++) {
-                          if (table[i][j] && table[i][j].indexOf("yellow")>-1) {?>
-                            <td style="text-align: center; background: yellow;"><?=table[i][j].slice(0, -6); ?></td><?
+                          var className = makeClassName(i, j, next_a_c, next_b_d, "first", totalSlots[0][4], totalSlots[1][4], totalSlots[2][4], totalSlots[3][4]);
+                          if (table[i][j] && table[i][j].indexOf("yellow") > -1) {
+                            ?>
+                            <td class="<?=className; ?>" style="text-align: center; background: yellow;"><?=table[i][j].slice(0, -6); ?></td><?
                           } else {?>
-                            <td style="text-align: center;"><?=table[i][j]; ?></td><?
+                            <td class="<?=className; ?>" style="text-align: center;"><?=table[i][j]; ?></td><?
                           }
                         }?>
                         </tr><?
@@ -480,8 +517,7 @@
                   </table>
                   <table style="border: 1px solid black; border-collapse: collapse; width: 100%; margin-top: 8%;">
                     <tr style="background: lightgray;">
-                      <? var crew = detectCrew(nextToday);
-                      if (crew == "A_C") { ?>
+                      <? if (nextCrew == "A_C") { ?>
                         <th>C crew</th>
                         <th>C crew</th>
                         <th>D crew</th>
@@ -499,16 +535,17 @@
                         <th>D crew</th>
                       <? } ?>
                     </tr><?
-                      var persons = make_persons(crew, "Inline", week, dataForCurrent, "second");
-                      var max_length = get_max_length(persons);
-                      var table = create_table(persons, max_length);
-                      for (var i = 0; i < max_length; i++) {?>
+                      var persons = make_persons(nextCrew, "Inline", week, dataForCurrent, "second");
+                      var table = create_table(persons, length.inlineNextCD);
+                      for (var i = 0; i < length.inlineNextCD; i++) {?>
                         <tr><?
                         for (var j = 0; j < 7; j++) {
-                          if (table[i][j] && table[i][j].indexOf("yellow")>-1) {?>
-                            <td style="text-align: center; background: yellow;"><?=table[i][j].slice(0, -6); ?></td><?
+                          var className = makeClassName(i, j, next_a_c, next_b_d, "second", totalSlots[0][4], totalSlots[1][4], totalSlots[2][4], totalSlots[3][4]);
+                          if (table[i][j] && table[i][j].indexOf("yellow") > -1) {
+                            ?>
+                            <td class="<?=className; ?>" style="text-align: center; background: yellow;"><?=table[i][j].slice(0, -6); ?></td><?
                           } else {?>
-                            <td style="text-align: center;"><?=table[i][j]; ?></td><?
+                            <td class="<?=className; ?>" style="text-align: center;"><?=table[i][j]; ?></td><?
                           }
                         }?>
                         </tr><?
@@ -550,8 +587,7 @@
               } ?>
             </tr>
             <tr style="background: lightgray;">
-            <? var crew = detectCrew(new Date());
-              if (crew == "A_C") { ?>
+            <?  if (crew == "A_C") { ?>
                 <th>A crew</th>
                 <th>A crew</th>
                 <th>B crew</th>
@@ -570,15 +606,16 @@
             <? } ?>
             </tr><?
               var persons = make_persons(crew, "Eco Star", week, dataForCurrent, "first");
-              var max_length = get_max_length(persons);
-              var table = create_table(persons, max_length);
-              for (var i = 0; i < max_length; i++) {?>
+              var table = create_table(persons, length.ecoStarCurAB);
+              for (var i = 0; i < length.ecoStarCurAB; i++) {?>
                 <tr><?
                 for (var j = 0; j < 7; j++) {
-                  if (table[i][j] && table[i][j].indexOf("yellow")>-1) {?>
-                    <td style="text-align: center; background: yellow;"><?=table[i][j].slice(0, -6); ?></td><?
+                  var className = makeClassName(i, j, a_c, b_d, "first", totalSlots[0][14], totalSlots[1][14], totalSlots[2][14], totalSlots[3][14]);
+                  if (table[i][j] && table[i][j].indexOf("yellow") > -1) {
+                    ?>
+                    <td class="<?=className; ?>" style="text-align: center; background: yellow;"><?=table[i][j].slice(0, -6); ?></td><?
                   } else {?>
-                    <td style="text-align: center;"><?=table[i][j]; ?></td><?
+                    <td class="<?=className; ?>" style="text-align: center;"><?=table[i][j]; ?></td><?
                   }
                 }?>
                 </tr><?
@@ -605,15 +642,16 @@
             <? } ?>
             </tr><?
               var persons = make_persons(crew, "Eco Star", week, dataForCurrent, "second");
-              var max_length = get_max_length(persons);
-              var table = create_table(persons, max_length);
-              for (var i = 0; i < max_length; i++) {?>
+              var table = create_table(persons, length.ecoStarCurCD);
+              for (var i = 0; i < length.ecoStarCurCD; i++) {?>
                 <tr><?
                 for (var j = 0; j < 7; j++) {
-                  if (table[i][j] && table[i][j].indexOf("yellow")>-1) {?>
-                    <td style="text-align: center; background: yellow;"><?=table[i][j].slice(0, -6); ?></td><?
+                  var className = makeClassName(i, j, a_c, b_d, "second", totalSlots[0][14], totalSlots[1][14], totalSlots[2][14], totalSlots[3][14]);
+                  if (table[i][j] && table[i][j].indexOf("yellow") > -1) {
+                    ?>
+                    <td class="<?=className; ?>" style="text-align: center; background: yellow;"><?=table[i][j].slice(0, -6); ?></td><?
                   } else {?>
-                    <td style="text-align: center;"><?=table[i][j]; ?></td><?
+                    <td class="<?=className; ?>" style="text-align: center;"><?=table[i][j]; ?></td><?
                   }
                 }?>
                 </tr><?
@@ -646,10 +684,7 @@
                       } ?>
                     </tr>
                     <tr style="background: lightgray;"><? 
-                      var nextToday = new Date();
-                      nextToday.setDate(nextToday.getDate() + 7);
-                      var crew = detectCrew(nextToday);
-                      if (crew == "A_C") { ?>
+                      if (nextCrew == "A_C") { ?>
                         <th>A crew</th>
                         <th>A crew</th>
                         <th>B crew</th>
@@ -667,16 +702,17 @@
                         <th>B crew</th>
                     <? } ?>
                     </tr><?
-                      var persons = make_persons(crew, "Eco Star", week, dataForCurrent, "first");
-                      var max_length = get_max_length(persons);
-                      var table = create_table(persons, max_length);
-                      for (var i = 0; i < max_length; i++) {?>
+                      var persons = make_persons(nextCrew, "Eco Star", week, dataForCurrent, "first");
+                      var table = create_table(persons, length.ecoStarNextAB);
+                      for (var i = 0; i < length.ecoStarNextAB; i++) {?>
                         <tr><?
                         for (var j = 0; j < 7; j++) {
-                          if (table[i][j] && table[i][j].indexOf("yellow")>-1) {?>
-                            <td style="text-align: center; background: yellow;"><?=table[i][j].slice(0, -6); ?></td><?
+                          var className = makeClassName(i, j, next_a_c, next_b_d, "first", totalSlots[0][16], totalSlots[1][16], totalSlots[2][16], totalSlots[3][16]);
+                          if (table[i][j] && table[i][j].indexOf("yellow") > -1) {
+                            ?>
+                            <td class="<?=className; ?>" style="text-align: center; background: yellow;"><?=table[i][j].slice(0, -6); ?></td><?
                           } else {?>
-                            <td style="text-align: center;"><?=table[i][j]; ?></td><?
+                            <td class="<?=className; ?>" style="text-align: center;"><?=table[i][j]; ?></td><?
                           }
                         }?>
                         </tr><?
@@ -684,8 +720,7 @@
                   </table>
                   <table style="border: 1px solid black; border-collapse: collapse; width: 100%; margin-top: 8%;">
                     <tr style="background: lightgray;">
-                      <? var crew = detectCrew(nextToday);
-                      if (crew == "A_C") { ?>
+                      <? if (nextCrew == "A_C") { ?>
                         <th>C crew</th>
                         <th>C crew</th>
                         <th>D crew</th>
@@ -703,16 +738,17 @@
                         <th>D crew</th>
                       <? } ?>
                     </tr><?
-                      var persons = make_persons(crew, "Eco Star", week, dataForCurrent, "second");
-                      var max_length = get_max_length(persons);
-                      var table = create_table(persons, max_length);
-                      for (var i = 0; i < max_length; i++) {?>
+                      var persons = make_persons(nextCrew, "Eco Star", week, dataForCurrent, "second");
+                      var table = create_table(persons, length.ecoStarNextCD);
+                      for (var i = 0; i < length.ecoStarNextCD; i++) {?>
                         <tr><?
                         for (var j = 0; j < 7; j++) {
-                          if (table[i][j] && table[i][j].indexOf("yellow")>-1) {?>
-                            <td style="text-align: center; background: yellow;"><?=table[i][j].slice(0, -6); ?></td><?
+                          var className = makeClassName(i, j, next_a_c, next_b_d, "second", totalSlots[0][16], totalSlots[1][16], totalSlots[2][16], totalSlots[3][16]);
+                          if (table[i][j] && table[i][j].indexOf("yellow") > -1) {
+                            ?>
+                            <td class="<?=className; ?>" style="text-align: center; background: yellow;"><?=table[i][j].slice(0, -6); ?></td><?
                           } else {?>
-                            <td style="text-align: center;"><?=table[i][j]; ?></td><?
+                            <td class="<?=className; ?>" style="text-align: center;"><?=table[i][j]; ?></td><?
                           }
                         }?>
                         </tr><?
@@ -754,8 +790,7 @@
               } ?>
             </tr>
             <tr style="background: lightgray;">
-            <? var crew = detectCrew(new Date());
-              if (crew == "A_C") { ?>
+            <?  if (crew == "A_C") { ?>
                 <th>A crew</th>
                 <th>A crew</th>
                 <th>B crew</th>
@@ -774,15 +809,16 @@
             <? } ?>
             </tr><?
               var persons = make_persons(crew, "North Plant", week, dataForCurrent, "first");
-              var max_length = get_max_length(persons);
-              var table = create_table(persons, max_length);
-              for (var i = 0; i < max_length; i++) {?>
+              var table = create_table(persons, length.northPlantCurAB);
+              for (var i = 0; i < length.northPlantCurAB; i++) {?>
                 <tr><?
                 for (var j = 0; j < 7; j++) {
-                  if (table[i][j] && table[i][j].indexOf("yellow")>-1) {?>
-                    <td style="text-align: center; background: yellow;"><?=table[i][j].slice(0, -6); ?></td><?
+                  var className = makeClassName(i, j, a_c, b_d, "first", totalSlots[0][19], totalSlots[1][19], totalSlots[2][19], totalSlots[3][19]);
+                  if (table[i][j] && table[i][j].indexOf("yellow") > -1) {
+                    ?>
+                    <td class="<?=className; ?>" style="text-align: center; background: yellow;"><?=table[i][j].slice(0, -6); ?></td><?
                   } else {?>
-                    <td style="text-align: center;"><?=table[i][j]; ?></td><?
+                    <td class="<?=className; ?>" style="text-align: center;"><?=table[i][j]; ?></td><?
                   }
                 }?>
                 </tr><?
@@ -809,15 +845,16 @@
             <? } ?>
             </tr><?
               var persons = make_persons(crew, "North Plant", week, dataForCurrent, "second");
-              var max_length = get_max_length(persons);
-              var table = create_table(persons, max_length);
-              for (var i = 0; i < max_length; i++) {?>
+              var table = create_table(persons, length.northPlantCurCD);
+              for (var i = 0; i < length.northPlantCurCD; i++) {?>
                 <tr><?
                 for (var j = 0; j < 7; j++) {
-                  if (table[i][j] && table[i][j].indexOf("yellow")>-1) {?>
-                    <td style="text-align: center; background: yellow;"><?=table[i][j].slice(0, -6); ?></td><?
+                  var className = makeClassName(i, j, a_c, b_d, "second", totalSlots[0][19], totalSlots[1][19], totalSlots[2][19], totalSlots[3][19]);
+                  if (table[i][j] && table[i][j].indexOf("yellow") > -1) {
+                    ?>
+                    <td class="<?=className; ?>" style="text-align: center; background: yellow;"><?=table[i][j].slice(0, -6); ?></td><?
                   } else {?>
-                    <td style="text-align: center;"><?=table[i][j]; ?></td><?
+                    <td class="<?=className; ?>" style="text-align: center;"><?=table[i][j]; ?></td><?
                   }
                 }?>
                 </tr><?
@@ -850,10 +887,7 @@
                       } ?>
                     </tr>
                     <tr style="background: lightgray;"><? 
-                      var nextToday = new Date();
-                      nextToday.setDate(nextToday.getDate() + 7);
-                      var crew = detectCrew(nextToday);
-                      if (crew == "A_C") { ?>
+                      if (nextCrew == "A_C") { ?>
                         <th>A crew</th>
                         <th>A crew</th>
                         <th>B crew</th>
@@ -871,16 +905,17 @@
                         <th>B crew</th>
                     <? } ?>
                     </tr><?
-                      var persons = make_persons(crew, "North Plant", week, dataForCurrent, "first");
-                      var max_length = get_max_length(persons);
-                      var table = create_table(persons, max_length);
-                      for (var i = 0; i < max_length; i++) {?>
+                      var persons = make_persons(nextCrew, "North Plant", week, dataForCurrent, "first");
+                      var table = create_table(persons, length.northPlantNextAB);
+                      for (var i = 0; i < length.northPlantNextAB; i++) {?>
                         <tr><?
                         for (var j = 0; j < 7; j++) {
-                          if (table[i][j] && table[i][j].indexOf("yellow")>-1) {?>
-                            <td style="text-align: center; background: yellow;"><?=table[i][j].slice(0, -6); ?></td><?
+                          var className = makeClassName(i, j, next_a_c, next_b_d, "first", totalSlots[0][21], totalSlots[1][21], totalSlots[2][21], totalSlots[3][21]);
+                          if (table[i][j] && table[i][j].indexOf("yellow") > -1) {
+                            ?>
+                            <td class="<?=className; ?>" style="text-align: center; background: yellow;"><?=table[i][j].slice(0, -6); ?></td><?
                           } else {?>
-                            <td style="text-align: center;"><?=table[i][j]; ?></td><?
+                            <td class="<?=className; ?>" style="text-align: center;"><?=table[i][j]; ?></td><?
                           }
                         }?>
                         </tr><?
@@ -888,8 +923,7 @@
                   </table>
                   <table style="border: 1px solid black; border-collapse: collapse; width: 100%; margin-top: 8%;">
                     <tr style="background: lightgray;">
-                      <? var crew = detectCrew(nextToday);
-                      if (crew == "A_C") { ?>
+                      <? if (nextCrew == "A_C") { ?>
                         <th>C crew</th>
                         <th>C crew</th>
                         <th>D crew</th>
@@ -907,16 +941,17 @@
                         <th>D crew</th>
                       <? } ?>
                     </tr><?
-                      var persons = make_persons(crew, "North Plant", week, dataForCurrent, "second");
-                      var max_length = get_max_length(persons);
-                      var table = create_table(persons, max_length);
-                      for (var i = 0; i < max_length; i++) {?>
+                      var persons = make_persons(nextCrew, "North Plant", week, dataForCurrent, "second");
+                      var table = create_table(persons, length.northPlantNextCD);
+                      for (var i = 0; i < length.northPlantNextCD; i++) {?>
                         <tr><?
                         for (var j = 0; j < 7; j++) {
-                          if (table[i][j] && table[i][j].indexOf("yellow")>-1) {?>
-                            <td style="text-align: center; background: yellow;"><?=table[i][j].slice(0, -6); ?></td><?
+                          var className = makeClassName(i, j, next_a_c, next_b_d, "second", totalSlots[0][21], totalSlots[1][21], totalSlots[2][21], totalSlots[3][21]);
+                          if (table[i][j] && table[i][j].indexOf("yellow") > -1) {
+                            ?>
+                            <td class="<?=className; ?>" style="text-align: center; background: yellow;"><?=table[i][j].slice(0, -6); ?></td><?
                           } else {?>
-                            <td style="text-align: center;"><?=table[i][j]; ?></td><?
+                            <td class="<?=className; ?>" style="text-align: center;"><?=table[i][j]; ?></td><?
                           }
                         }?>
                         </tr><?

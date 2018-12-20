@@ -4,13 +4,6 @@
       .setXFrameOptionsMode(HtmlService.XFrameOptionsMode.ALLOWALL);
   }
 
-  function openDialog() {
-    var html = HtmlService.createTemplateFromFile('roll_fed_next_week.html')
-      .evaluate()
-      .setSandboxMode(HtmlService.SandboxMode.IFRAME).setHeight(500);
-
-    SpreadsheetApp.getUi().showModalDialog(html, 'Dialog title');
-  }
   function getDataSortDate() {
     return SpreadsheetApp
       .openById('1-HmBSO0ViOWjC4ttaAxOZ1sygnfWmKvMJBswBRyouQA')
@@ -27,7 +20,13 @@
       .sort(3)
       .getValues();
   }
-
+  function getTotalSlots() {
+    return SpreadsheetApp
+      .openById('1-HmBSO0ViOWjC4ttaAxOZ1sygnfWmKvMJBswBRyouQA')
+      .getSheetByName('Form Responses 1')
+      .getRange(4, 2, 4, 23)
+      .getValues();
+  }
   function detectCrew(now) {
     var first = new Date(now.getFullYear(), 0, 1);
     var weekNo = Math.ceil( (((now - first) / 86400000) + first.getDay() + 1) / 7 );
@@ -36,6 +35,34 @@
     } else {
       return "B_D";
     }
+  }
+  function makeClassName(i, j, a_c, b_d, order, num_a, num_b, num_c, num_d) {
+    var className = "";
+    var num = 0;
+    if (a_c.indexOf(j) > -1) {
+      if (order == "first") {
+        num = num_a;
+      } else {
+        num = num_c;
+      }
+    } else if (b_d.indexOf(j) > -1) {
+      if (order == "first") {
+        num = num_b;
+      } else {
+        num = num_d;
+      }
+    }
+    if (i != 0 && i == num - 1) {
+        className = "bottom";
+    } else if (i != 0 && i < num - 1) {
+        className = "medium";
+    } else if (i == 0 && i == num - 1) {
+        className = "full";
+    } else if (i == 0 && i < num - 1) {
+        className = "top";
+    }
+    Logger.log(className)
+    return className
   }
   function firstOfWeek(diff) {
     var now = new Date();
@@ -62,11 +89,15 @@
     for (var i = 0; i < data.length; i++) {
       var start = "";
       var last = "";
+      var absence = "";
       if (data[i][6]) {
         start = new Date(new Date(data[i][6]).getTime() + 2 * 60* 60* 1000);
       }
       if (data[i][9]) {
         last = new Date(new Date(data[i][9]).getTime() + 2 * 60* 60* 1000);
+      }
+      if (data[i][10]) {
+        absence = new Date(new Date(data[i][10]).getTime() + 2 * 60* 60* 1000);
       }
       if (start && data[i][3] == dept && data[i][4] == crew){
         if (!last || last > date) {
@@ -103,14 +134,29 @@
     }
     return persons;
   }
-  function get_max_length(persons) {
-    max_length = 0;
-    for (var i=0; i<persons.length; i++) {
-      if (persons[i].length > max_length) {
-        max_length = persons[i].length;
-      }
-    }
-    return max_length;
+  function get_length(totalSlots) {
+    var length = {};
+    length.rollFedCurAB = Math.max(totalSlots[0][9], totalSlots[1][9]);
+    length.rollFedCurCD = Math.max(totalSlots[2][9], totalSlots[3][9]);
+    length.rollFedNextAB = Math.max(totalSlots[0][11], totalSlots[1][11]);
+    length.rollFedNextCD = Math.max(totalSlots[2][11], totalSlots[3][11]);
+
+    length.inlineCurAB = Math.max(totalSlots[0][2], totalSlots[1][2]);
+    length.inlineCurCD = Math.max(totalSlots[2][2], totalSlots[3][2]);
+    length.inlineNextAB = Math.max(totalSlots[0][4], totalSlots[1][4]);
+    length.inlineNextCD = Math.max(totalSlots[2][4], totalSlots[3][4]);
+
+    length.ecoStarCurAB = Math.max(totalSlots[0][14], totalSlots[1][14]);
+    length.ecoStarCurCD = Math.max(totalSlots[2][14], totalSlots[3][14]);
+    length.ecoStarNextAB = Math.max(totalSlots[0][16], totalSlots[1][16]);
+    length.ecoStarNextCD = Math.max(totalSlots[2][16], totalSlots[3][16]);
+
+    length.northPlantCurAB = Math.max(totalSlots[0][19], totalSlots[1][19]);
+    length.northPlantCurCD = Math.max(totalSlots[2][19], totalSlots[3][19]);
+    length.northPlantNextAB = Math.max(totalSlots[0][21], totalSlots[1][21]);
+    length.northPlantNextCD = Math.max(totalSlots[2][21], totalSlots[3][21]);
+
+    return length;
   }
   function create_table(persons, max_length) {
     var table = new Array(7);
