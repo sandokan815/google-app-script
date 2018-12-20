@@ -50,6 +50,7 @@
       border-radius: 3px;
       font-weight: bold;
       cursor: pointer;
+      margin-top: 10px;
     }
     button:hover {
       background: #07c;
@@ -70,12 +71,22 @@
       color: white;
       margin-bottom: 0px;
     }
-    @media print {
-	  body * {
-	    visibility: hidden;
-	  }
-	}
-    </style>
+    .modal-dialog {
+      width: 800px;
+    }
+    .rollFed {
+      top: 22%;
+    }
+    .inline {
+      top: 42%;
+    }
+    .ecoStar {
+      top: 61%;
+    }
+    .northPlant {
+      top: 81%;
+    }
+</style>
   </head>
   <body style="background: #d9d9d9;"><?
     var dataForCurrent = getDataSortName();
@@ -156,7 +167,7 @@
               for (var i = 0; i < max_length; i++) {?>
                 <tr><?
                 for (var j = 0; j < 7; j++) {
-                  if (table[i][j] && table[i][j].indexOf("yellow")>-1) {?>
+                  if (table[i][j] && table[i][j].indexOf("yellow") > -1) {?>
                     <td style="text-align: center; background: yellow;"><?=table[i][j].slice(0, -6); ?></td><?
                   } else {?>
                     <td style="text-align: center;"><?=table[i][j]; ?></td><?
@@ -202,7 +213,7 @@
           </table>
         </div>
       </div>
-      <div id="rollFedNextWeek" class="modal fade" role="dialog">
+      <div id="rollFedNextWeek" class="modal rollFed fade" role="dialog">
         <div class="modal-dialog">
           <div class="modal-content">
             <div class="modal-body">
@@ -406,7 +417,7 @@
           </table>          
 	    </div>
       </div>
-      <div id="inlineNextWeek" class="modal fade" role="dialog">
+      <div id="inlineNextWeek" class="modal inline fade" role="dialog">
           <div class="modal-dialog">
             <div class="modal-content">
               <div class="modal-body">
@@ -610,7 +621,7 @@
           </table>
 	      </div>	
       </div>
-      <div id="ecoStarNextWeek" class="modal fade" role="dialog">
+      <div id="ecoStarNextWeek" class="modal ecoStar fade" role="dialog">
           <div class="modal-dialog">
             <div class="modal-content">
               <div class="modal-body">
@@ -814,7 +825,7 @@
           </table>
 	      </div>	
       </div>
-      <div id="northPlantNextWeek" class="modal fade" role="dialog">
+      <div id="northPlantNextWeek" class="modal northPlant fade" role="dialog">
           <div class="modal-dialog">
             <div class="modal-content">
               <div class="modal-body">
@@ -934,9 +945,6 @@
       window.frames['print_frame'].document.body.innerHTML = htmlToPrint;
       window.frames["print_frame"].window.focus();
       window.frames["print_frame"].window.print();
-    }
-    function openDialog(roster_id) {
-      
     }
   </script>
 </html>
