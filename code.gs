@@ -8,7 +8,7 @@
     return SpreadsheetApp
       .openById('1-HmBSO0ViOWjC4ttaAxOZ1sygnfWmKvMJBswBRyouQA')
       .getSheetByName('Form Responses 1')
-      .getRange('A11:J')
+      .getRange('A11:K')
       .sort(7)
       .getValues();
   }
@@ -16,7 +16,7 @@
     return SpreadsheetApp
       .openById('1-HmBSO0ViOWjC4ttaAxOZ1sygnfWmKvMJBswBRyouQA')
       .getSheetByName('Form Responses 1')
-      .getRange('A11:J')
+      .getRange('A11:K')
       .sort(3)
       .getValues();
   }
@@ -30,6 +30,9 @@
   function detectCrew(now) {
     var first = new Date(now.getFullYear(), 0, 1);
     var weekNo = Math.ceil( (((now - first) / 86400000) + first.getDay() + 1) / 7 );
+    if (now.getDay() == 0) {
+      weekNo = weekNo - 1;
+    }
     if (weekNo % 2 == 0) {
       return "A_C";
     } else {
@@ -61,19 +64,26 @@
     } else if (i == 0 && i < num - 1) {
         className = "top";
     }
-    Logger.log(className)
     return className
   }
   function firstOfWeek(diff) {
     var now = new Date();
     var today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
-    var monday = new Date(today.setDate(today.getDate()-today.getDay() + diff));
+    var day = today.getDay();
+    if (day == 0) {
+        day = 7;
+    }
+    var monday = new Date(today.setDate(today.getDate() - day + 1));
     return monday;
   }
   
   function getWeek(diff) {
     var curr = new Date();
-    var first = curr.getDate() - curr.getDay() + diff;
+    var day = curr.getDay();
+    if (day == 0) {
+        day = 7;
+    }
+    var first = curr.getDate() - day + diff;
     var week = [];
     for (var i = 0; i < 7; i++) {
       var next = new Date(curr.getTime());
@@ -102,11 +112,19 @@
       if (start && data[i][3] == dept && data[i][4] == crew){
         if (!last || last > date) {
           if (start < date) {
-            person.push(data[i][1] + " " + data[i][2]);
+            if (absence > date || absence < date) {
+              person.push(data[i][1] + " " + data[i][2]);
+            } else {
+              person.push(data[i][1] + " " + data[i][2] + 'strike');  
+            }
           } else if (start > date) {
             continue;
           } else {
-            person.push(data[i][1] + " " + data[i][2] + 'yellow');
+            if (absence > date || absence < date) {
+              person.push(data[i][1] + " " + data[i][2] + 'yellow')
+            } else {
+              person.push(data[i][1] + " " + data[i][2] + 'ye_str');
+            }
           }
         }
       }
@@ -174,3 +192,41 @@
     }
     return table;
   }
+
+function downloadData(rollFedArray, inlineArray, ecoStarArray, northPlantArray){
+  var spreadsheetId = '1Ojl9dNq24dm6JkgB5GEOVZlsTL7k5LNT2F1FIwDKuJ4';
+  var sheetName = '23/12/2018';
+  var activeSpreadsheet = SpreadsheetApp.openById(spreadsheetId);
+  var newSheet = activeSpreadsheet.getSheetByName(sheetName);
+  
+  var length = get_length(getTotalSlots());
+  var rollFedLen = length.rollFedCurAB + length.rollFedCurCD + 4;
+  var inlineLen = length.inlineCurAB + length.inlineCurCD + 4;
+  var ecoStarLen = length.ecoStarCurAB + length.ecoStarCurCD + 4;
+  var northPlantLen = length.northPlantCurAB + length.northPlantCurCD + 4;
+  
+  var rollFedRange = 'B2:H' + (rollFedLen + 1);
+  var inlineRange = 'B'+ (rollFedLen + 2) + ':H' + (rollFedLen + inlineLen + 1);
+  var ecoStarRange = 'B'+ (rollFedLen + inlineLen + 3) + ':H' + (rollFedLen + inlineLen + ecoStarLen + 2);
+  var northPlantRange = 'B'+ (rollFedLen + inlineLen + ecoStarLen + 4) + ':H' + (rollFedLen + inlineLen + ecoStarLen + northPlantLen + 3);
+
+  if (newSheet == null) {
+    newSheet = activeSpreadsheet.insertSheet();
+    newSheet.setName(sheetName);
+    //RollFed
+    newSheet.getRange('A1').setValue('RollFed');
+    newSheet.getRange(rollFedRange).setValues(rollFedArray);
+    //Inline
+    newSheet.getRange('A'+ (rollFedLen + 1)).setValue('Inline');
+    newSheet.getRange(inlineRange).setValues(inlineArray);
+    //Eco Star
+    newSheet.getRange('A'+ (rollFedLen + inlineLen + 2)).setValue('Eco Star');
+    newSheet.getRange(ecoStarRange).setValues(ecoStarArray);
+    //North Plant
+    newSheet.getRange('A'+ (rollFedLen + inlineLen + ecoStarLen + 3)).setValue('North Plant');
+    newSheet.getRange(northPlantRange).setValues(northPlantArray);
+    return true;
+  } else {
+    return false;
+  }
+}

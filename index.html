@@ -166,7 +166,7 @@
             <label style="background: orange; font-size: 25px;">Roll Fed</label>
             <label style="font-size: 25px;">Week of: <?= Utilities.formatDate(firstOfWeek(1), "CST", "MM/dd/YY") ?></label>
           </div>
-          <table style="border: 1px solid black; border-collapse: collapse; width: 100%;">
+          <table class="table_group" style="border: 1px solid black; border-collapse: collapse; width: 100%;">
             <tr>
               <th>Monday</th>	
               <th>Tuesday</th>
@@ -205,10 +205,17 @@
               for (var i = 0; i < length.rollFedCurAB; i++) { ?>
                 <tr><?
                 for (var j = 0; j < 7; j++) {
-                var className = makeClassName(i, j, a_c, b_d, "first", totalSlots[0][9], totalSlots[1][9], totalSlots[2][9], totalSlots[3][9]);
-                  if (table[i][j] && table[i][j].indexOf("yellow") > -1) {
-                    ?>
-                    <td class="<?=className; ?>" style="text-align: center; background: yellow;"><?=table[i][j].slice(0, -6); ?></td><?
+                  var className = makeClassName(i, j, a_c, b_d, "first", totalSlots[0][9], totalSlots[1][9], totalSlots[2][9], totalSlots[3][9]);
+                  if (table[i][j]) {
+                    if (table[i][j].indexOf("yellow") > -1) { ?>
+                      <td class="<?=className; ?>" style="text-align: center; background: yellow;"><?=table[i][j].slice(0, -6); ?></td><?  
+                    } else if (table[i][j].indexOf("strike") > -1) { ?>
+                      <td class="<?=className; ?>" style="text-align: center; text-decoration: line-through; text-decoration-color: red;"><?=table[i][j].slice(0, -6); ?></td><?
+                    } else if (table[i][j].indexOf("ye_str") > -1) { ?>
+                      <td class="<?=className; ?>" style="text-align: center; background: yellow; text-decoration: line-through; text-decoration-color: red;"><?=table[i][j].slice(0, -6); ?></td><?
+                    } else { ?>
+                      <td class="<?=className; ?>" style="text-align: center;"><?=table[i][j] ?></td><?
+                    }
                   } else {?>
                     <td class="<?=className; ?>" style="text-align: center;"><?=table[i][j]; ?></td><?
                   }
@@ -216,7 +223,7 @@
                 </tr><?
               }?>
           </table>
-          <table style="border: 1px solid black; border-collapse: collapse; width: 100%; margin-top: 8%;">
+          <table class="table_group" style="border: 1px solid black; border-collapse: collapse; width: 100%; margin-top: 8%;">
             <tr style="background: lightgray;">
             <? if (crew == "A_C") { ?>
               <th>C crew</th>
@@ -242,9 +249,16 @@
                 <tr><?
                 for (var j = 0; j < 7; j++) {
                   var className = makeClassName(i, j, a_c, b_d, "second", totalSlots[0][9], totalSlots[1][9], totalSlots[2][9], totalSlots[3][9]);
-                  if (table[i][j] && table[i][j].indexOf("yellow") > -1) {
-                    ?>
-                    <td class="<?=className; ?>" style="text-align: center; background: yellow;"><?=table[i][j].slice(0, -6); ?></td><?
+                  if (table[i][j]) {
+                    if (table[i][j].indexOf("yellow") > -1) { ?>
+                      <td class="<?=className; ?>" style="text-align: center; background: yellow;"><?=table[i][j].slice(0, -6); ?></td><?  
+                    } else if (table[i][j].indexOf("strike") > -1) { ?>
+                      <td class="<?=className; ?>" style="text-align: center; text-decoration: line-through; text-decoration-color: red;"><?=table[i][j].slice(0, -6); ?></td><?
+                    } else if (table[i][j].indexOf("ye_str") > -1) { ?>
+                      <td class="<?=className; ?>" style="text-align: center; background: yellow; text-decoration: line-through; text-decoration-color: red;"><?=table[i][j].slice(0, -6); ?></td><?
+                    } else { ?>
+                      <td class="<?=className; ?>" style="text-align: center;"><?=table[i][j] ?></td><?
+                    }
                   } else {?>
                     <td class="<?=className; ?>" style="text-align: center;"><?=table[i][j]; ?></td><?
                   }
@@ -303,9 +317,16 @@
                       <tr><?
                       for (var j = 0; j < 7; j++) {
                         var className = makeClassName(i, j, next_a_c, next_b_d, "first", totalSlots[0][11], totalSlots[1][11], totalSlots[2][11], totalSlots[3][11]);
-                        if (table[i][j] && table[i][j].indexOf("yellow") > -1) {
-                          ?>
-                          <td class="<?=className; ?>" style="text-align: center; background: yellow;"><?=table[i][j].slice(0, -6); ?></td><?
+                        if (table[i][j]) {
+                          if (table[i][j].indexOf("yellow") > -1) { ?>
+                            <td class="<?=className; ?>" style="text-align: center; background: yellow;"><?=table[i][j].slice(0, -6); ?></td><?  
+                          } else if (table[i][j].indexOf("strike") > -1) { ?>
+                            <td class="<?=className; ?>" style="text-align: center; text-decoration: line-through; text-decoration-color: red;"><?=table[i][j].slice(0, -6); ?></td><?
+                          } else if (table[i][j].indexOf("ye_str") > -1) { ?>
+                            <td class="<?=className; ?>" style="text-align: center; background: yellow; text-decoration: line-through; text-decoration-color: red;"><?=table[i][j].slice(0, -6); ?></td><?
+                          } else { ?>
+                            <td class="<?=className; ?>" style="text-align: center;"><?=table[i][j] ?></td><?
+                          }
                         } else {?>
                           <td class="<?=className; ?>" style="text-align: center;"><?=table[i][j]; ?></td><?
                         }
@@ -339,9 +360,16 @@
                       <tr><?
                       for (var j = 0; j < 7; j++) {
                         var className = makeClassName(i, j, next_a_c, next_b_d, "second", totalSlots[0][11], totalSlots[1][11], totalSlots[2][11], totalSlots[3][11]);
-                        if (table[i][j] && table[i][j].indexOf("yellow") > -1) {
-                          ?>
-                          <td class="<?=className; ?>" style="text-align: center; background: yellow;"><?=table[i][j].slice(0, -6); ?></td><?
+                        if (table[i][j]) {
+                          if (table[i][j].indexOf("yellow") > -1) { ?>
+                            <td class="<?=className; ?>" style="text-align: center; background: yellow;"><?=table[i][j].slice(0, -6); ?></td><?  
+                          } else if (table[i][j].indexOf("strike") > -1) { ?>
+                            <td class="<?=className; ?>" style="text-align: center; text-decoration: line-through; text-decoration-color: red;"><?=table[i][j].slice(0, -6); ?></td><?
+                          } else if (table[i][j].indexOf("ye_str") > -1) { ?>
+                            <td class="<?=className; ?>" style="text-align: center; background: yellow; text-decoration: line-through; text-decoration-color: red;"><?=table[i][j].slice(0, -6); ?></td><?
+                          } else { ?>
+                            <td class="<?=className; ?>" style="text-align: center;"><?=table[i][j] ?></td><?
+                          }
                         } else {?>
                           <td class="<?=className; ?>" style="text-align: center;"><?=table[i][j]; ?></td><?
                         }
@@ -368,7 +396,7 @@
             <label style="background: green; font-size: 25px;">Inline</label>
             <label style="font-size: 25px;">Week of: <?= Utilities.formatDate(firstOfWeek(1), "CST", "MM/dd/YY") ?></label>
           </div>
-          <table style="border: 1px solid black; border-collapse: collapse; width: 100%;">
+          <table class="table_group" style="border: 1px solid black; border-collapse: collapse; width: 100%;">
             <tr>
               <th>Monday</th>	
               <th>Tuesday</th>
@@ -408,9 +436,16 @@
                 <tr><?
                 for (var j = 0; j < 7; j++) {
                   var className = makeClassName(i, j, a_c, b_d, "first", totalSlots[0][2], totalSlots[1][2], totalSlots[2][2], totalSlots[3][2]);
-                  if (table[i][j] && table[i][j].indexOf("yellow") > -1) {
-                    ?>
-                    <td class="<?=className; ?>" style="text-align: center; background: yellow;"><?=table[i][j].slice(0, -6); ?></td><?
+                  if (table[i][j]) {
+                    if (table[i][j].indexOf("yellow") > -1) { ?>
+                      <td class="<?=className; ?>" style="text-align: center; background: yellow;"><?=table[i][j].slice(0, -6); ?></td><?  
+                    } else if (table[i][j].indexOf("strike") > -1) { ?>
+                      <td class="<?=className; ?>" style="text-align: center; text-decoration: line-through; text-decoration-color: red;"><?=table[i][j].slice(0, -6); ?></td><?
+                    } else if (table[i][j].indexOf("ye_str") > -1) { ?>
+                      <td class="<?=className; ?>" style="text-align: center; background: yellow; text-decoration: line-through; text-decoration-color: red;"><?=table[i][j].slice(0, -6); ?></td><?
+                    } else { ?>
+                      <td class="<?=className; ?>" style="text-align: center;"><?=table[i][j] ?></td><?
+                    }
                   } else {?>
                     <td class="<?=className; ?>" style="text-align: center;"><?=table[i][j]; ?></td><?
                   }
@@ -418,7 +453,7 @@
                 </tr><?
               }?>
           </table>
-          <table style="border: 1px solid black; border-collapse: collapse; width: 100%; margin-top: 8%;">
+          <table class="table_group" style="border: 1px solid black; border-collapse: collapse; width: 100%; margin-top: 8%;">
             <tr style="background: lightgray;">
               <? if (crew == "A_C") { ?>
                 <th>C crew</th>
@@ -444,9 +479,16 @@
                 <tr><?
                 for (var j = 0; j < 7; j++) {
                   var className = makeClassName(i, j, a_c, b_d, "second", totalSlots[0][2], totalSlots[1][2], totalSlots[2][2], totalSlots[3][2]);
-                  if (table[i][j] && table[i][j].indexOf("yellow") > -1) {
-                    ?>
-                    <td class="<?=className; ?>" style="text-align: center; background: yellow;"><?=table[i][j].slice(0, -6); ?></td><?
+                  if (table[i][j]) {
+                    if (table[i][j].indexOf("yellow") > -1) { ?>
+                      <td class="<?=className; ?>" style="text-align: center; background: yellow;"><?=table[i][j].slice(0, -6); ?></td><?  
+                    } else if (table[i][j].indexOf("strike") > -1) { ?>
+                      <td class="<?=className; ?>" style="text-align: center; text-decoration: line-through; text-decoration-color: red;"><?=table[i][j].slice(0, -6); ?></td><?
+                    } else if (table[i][j].indexOf("ye_str") > -1) { ?>
+                      <td class="<?=className; ?>" style="text-align: center; background: yellow; text-decoration: line-through; text-decoration-color: red;"><?=table[i][j].slice(0, -6); ?></td><?
+                    } else { ?>
+                      <td class="<?=className; ?>" style="text-align: center;"><?=table[i][j] ?></td><?
+                    }
                   } else {?>
                     <td class="<?=className; ?>" style="text-align: center;"><?=table[i][j]; ?></td><?
                   }
@@ -505,9 +547,16 @@
                         <tr><?
                         for (var j = 0; j < 7; j++) {
                           var className = makeClassName(i, j, next_a_c, next_b_d, "first", totalSlots[0][4], totalSlots[1][4], totalSlots[2][4], totalSlots[3][4]);
-                          if (table[i][j] && table[i][j].indexOf("yellow") > -1) {
-                            ?>
-                            <td class="<?=className; ?>" style="text-align: center; background: yellow;"><?=table[i][j].slice(0, -6); ?></td><?
+                          if (table[i][j]) {
+                            if (table[i][j].indexOf("yellow") > -1) { ?>
+                              <td class="<?=className; ?>" style="text-align: center; background: yellow;"><?=table[i][j].slice(0, -6); ?></td><?  
+                            } else if (table[i][j].indexOf("strike") > -1) { ?>
+                              <td class="<?=className; ?>" style="text-align: center; text-decoration: line-through; text-decoration-color: red;"><?=table[i][j].slice(0, -6); ?></td><?
+                            } else if (table[i][j].indexOf("ye_str") > -1) { ?>
+                              <td class="<?=className; ?>" style="text-align: center; background: yellow; text-decoration: line-through; text-decoration-color: red;"><?=table[i][j].slice(0, -6); ?></td><?
+                            } else { ?>
+                              <td class="<?=className; ?>" style="text-align: center;"><?=table[i][j] ?></td><?
+                            }
                           } else {?>
                             <td class="<?=className; ?>" style="text-align: center;"><?=table[i][j]; ?></td><?
                           }
@@ -541,9 +590,16 @@
                         <tr><?
                         for (var j = 0; j < 7; j++) {
                           var className = makeClassName(i, j, next_a_c, next_b_d, "second", totalSlots[0][4], totalSlots[1][4], totalSlots[2][4], totalSlots[3][4]);
-                          if (table[i][j] && table[i][j].indexOf("yellow") > -1) {
-                            ?>
-                            <td class="<?=className; ?>" style="text-align: center; background: yellow;"><?=table[i][j].slice(0, -6); ?></td><?
+                          if (table[i][j]) {
+                            if (table[i][j].indexOf("yellow") > -1) { ?>
+                              <td class="<?=className; ?>" style="text-align: center; background: yellow;"><?=table[i][j].slice(0, -6); ?></td><?  
+                            } else if (table[i][j].indexOf("strike") > -1) { ?>
+                              <td class="<?=className; ?>" style="text-align: center; text-decoration: line-through; text-decoration-color: red;"><?=table[i][j].slice(0, -6); ?></td><?
+                            } else if (table[i][j].indexOf("ye_str") > -1) { ?>
+                              <td class="<?=className; ?>" style="text-align: center; background: yellow; text-decoration: line-through; text-decoration-color: red;"><?=table[i][j].slice(0, -6); ?></td><?
+                            } else { ?>
+                              <td class="<?=className; ?>" style="text-align: center;"><?=table[i][j] ?></td><?
+                            }
                           } else {?>
                             <td class="<?=className; ?>" style="text-align: center;"><?=table[i][j]; ?></td><?
                           }
@@ -571,7 +627,7 @@
             <label style="background: cyan; font-size: 25px;">Eco Star</label>
             <label style="font-size: 25px;">Week of: <?= Utilities.formatDate(firstOfWeek(1), "CST", "MM/dd/YY") ?></label>
           </div>
-          <table style="border: 1px solid black; border-collapse: collapse; width: 100%;">
+          <table class="table_group" style="border: 1px solid black; border-collapse: collapse; width: 100%;">
             <tr>
               <th>Monday</th>	
               <th>Tuesday</th>
@@ -611,9 +667,16 @@
                 <tr><?
                 for (var j = 0; j < 7; j++) {
                   var className = makeClassName(i, j, a_c, b_d, "first", totalSlots[0][14], totalSlots[1][14], totalSlots[2][14], totalSlots[3][14]);
-                  if (table[i][j] && table[i][j].indexOf("yellow") > -1) {
-                    ?>
-                    <td class="<?=className; ?>" style="text-align: center; background: yellow;"><?=table[i][j].slice(0, -6); ?></td><?
+                  if (table[i][j]) {
+                    if (table[i][j].indexOf("yellow") > -1) { ?>
+                      <td class="<?=className; ?>" style="text-align: center; background: yellow;"><?=table[i][j].slice(0, -6); ?></td><?  
+                    } else if (table[i][j].indexOf("strike") > -1) { ?>
+                      <td class="<?=className; ?>" style="text-align: center; text-decoration: line-through; text-decoration-color: red;"><?=table[i][j].slice(0, -6); ?></td><?
+                    } else if (table[i][j].indexOf("ye_str") > -1) { ?>
+                      <td class="<?=className; ?>" style="text-align: center; background: yellow; text-decoration: line-through; text-decoration-color: red;"><?=table[i][j].slice(0, -6); ?></td><?
+                    } else { ?>
+                      <td class="<?=className; ?>" style="text-align: center;"><?=table[i][j] ?></td><?
+                    }
                   } else {?>
                     <td class="<?=className; ?>" style="text-align: center;"><?=table[i][j]; ?></td><?
                   }
@@ -621,7 +684,7 @@
                 </tr><?
               }?>
           </table>
-          <table style="border: 1px solid black; border-collapse: collapse; width: 100%; margin-top: 8%;">
+          <table class="table_group" style="border: 1px solid black; border-collapse: collapse; width: 100%; margin-top: 8%;">
             <tr style="background: lightgray;">
             <? if (crew == "A_C") { ?>
               <th>C crew</th>
@@ -647,9 +710,16 @@
                 <tr><?
                 for (var j = 0; j < 7; j++) {
                   var className = makeClassName(i, j, a_c, b_d, "second", totalSlots[0][14], totalSlots[1][14], totalSlots[2][14], totalSlots[3][14]);
-                  if (table[i][j] && table[i][j].indexOf("yellow") > -1) {
-                    ?>
-                    <td class="<?=className; ?>" style="text-align: center; background: yellow;"><?=table[i][j].slice(0, -6); ?></td><?
+                  if (table[i][j]) {
+                    if (table[i][j].indexOf("yellow") > -1) { ?>
+                      <td class="<?=className; ?>" style="text-align: center; background: yellow;"><?=table[i][j].slice(0, -6); ?></td><?  
+                    } else if (table[i][j].indexOf("strike") > -1) { ?>
+                      <td class="<?=className; ?>" style="text-align: center; text-decoration: line-through; text-decoration-color: red;"><?=table[i][j].slice(0, -6); ?></td><?
+                    } else if (table[i][j].indexOf("ye_str") > -1) { ?>
+                      <td class="<?=className; ?>" style="text-align: center; background: yellow; text-decoration: line-through; text-decoration-color: red;"><?=table[i][j].slice(0, -6); ?></td><?
+                    } else { ?>
+                      <td class="<?=className; ?>" style="text-align: center;"><?=table[i][j] ?></td><?
+                    }
                   } else {?>
                     <td class="<?=className; ?>" style="text-align: center;"><?=table[i][j]; ?></td><?
                   }
@@ -708,9 +778,16 @@
                         <tr><?
                         for (var j = 0; j < 7; j++) {
                           var className = makeClassName(i, j, next_a_c, next_b_d, "first", totalSlots[0][16], totalSlots[1][16], totalSlots[2][16], totalSlots[3][16]);
-                          if (table[i][j] && table[i][j].indexOf("yellow") > -1) {
-                            ?>
-                            <td class="<?=className; ?>" style="text-align: center; background: yellow;"><?=table[i][j].slice(0, -6); ?></td><?
+                          if (table[i][j]) {
+                            if (table[i][j].indexOf("yellow") > -1) { ?>
+                              <td class="<?=className; ?>" style="text-align: center; background: yellow;"><?=table[i][j].slice(0, -6); ?></td><?  
+                            } else if (table[i][j].indexOf("strike") > -1) { ?>
+                              <td class="<?=className; ?>" style="text-align: center; text-decoration: line-through; text-decoration-color: red;"><?=table[i][j].slice(0, -6); ?></td><?
+                            } else if (table[i][j].indexOf("ye_str") > -1) { ?>
+                              <td class="<?=className; ?>" style="text-align: center; background: yellow; text-decoration: line-through; text-decoration-color: red;"><?=table[i][j].slice(0, -6); ?></td><?
+                            } else { ?>
+                              <td class="<?=className; ?>" style="text-align: center;"><?=table[i][j] ?></td><?
+                            }
                           } else {?>
                             <td class="<?=className; ?>" style="text-align: center;"><?=table[i][j]; ?></td><?
                           }
@@ -744,9 +821,16 @@
                         <tr><?
                         for (var j = 0; j < 7; j++) {
                           var className = makeClassName(i, j, next_a_c, next_b_d, "second", totalSlots[0][16], totalSlots[1][16], totalSlots[2][16], totalSlots[3][16]);
-                          if (table[i][j] && table[i][j].indexOf("yellow") > -1) {
-                            ?>
-                            <td class="<?=className; ?>" style="text-align: center; background: yellow;"><?=table[i][j].slice(0, -6); ?></td><?
+                          if (table[i][j]) {
+                            if (table[i][j].indexOf("yellow") > -1) { ?>
+                              <td class="<?=className; ?>" style="text-align: center; background: yellow;"><?=table[i][j].slice(0, -6); ?></td><?  
+                            } else if (table[i][j].indexOf("strike") > -1) { ?>
+                              <td class="<?=className; ?>" style="text-align: center; text-decoration: line-through; text-decoration-color: red;"><?=table[i][j].slice(0, -6); ?></td><?
+                            } else if (table[i][j].indexOf("ye_str") > -1) { ?>
+                              <td class="<?=className; ?>" style="text-align: center; background: yellow; text-decoration: line-through; text-decoration-color: red;"><?=table[i][j].slice(0, -6); ?></td><?
+                            } else { ?>
+                              <td class="<?=className; ?>" style="text-align: center;"><?=table[i][j] ?></td><?
+                            }
                           } else {?>
                             <td class="<?=className; ?>" style="text-align: center;"><?=table[i][j]; ?></td><?
                           }
@@ -774,7 +858,7 @@
             <label style="background: yellow; font-size: 25px;">North Plant</label>
             <label style="font-size: 25px;">Week of: <?= Utilities.formatDate(firstOfWeek(1), "CST", "MM/dd/YY") ?></label>
           </div>
-          <table style="border: 1px solid black; border-collapse: collapse; width: 100%;">
+          <table class="table_group" style="border: 1px solid black; border-collapse: collapse; width: 100%;">
             <tr>
               <th>Monday</th>	
               <th>Tuesday</th>
@@ -814,9 +898,16 @@
                 <tr><?
                 for (var j = 0; j < 7; j++) {
                   var className = makeClassName(i, j, a_c, b_d, "first", totalSlots[0][19], totalSlots[1][19], totalSlots[2][19], totalSlots[3][19]);
-                  if (table[i][j] && table[i][j].indexOf("yellow") > -1) {
-                    ?>
-                    <td class="<?=className; ?>" style="text-align: center; background: yellow;"><?=table[i][j].slice(0, -6); ?></td><?
+                  if (table[i][j]) {
+                    if (table[i][j].indexOf("yellow") > -1) { ?>
+                      <td class="<?=className; ?>" style="text-align: center; background: yellow;"><?=table[i][j].slice(0, -6); ?></td><?  
+                    } else if (table[i][j].indexOf("strike") > -1) { ?>
+                      <td class="<?=className; ?>" style="text-align: center; text-decoration: line-through; text-decoration-color: red;"><?=table[i][j].slice(0, -6); ?></td><?
+                    } else if (table[i][j].indexOf("ye_str") > -1) { ?>
+                      <td class="<?=className; ?>" style="text-align: center; background: yellow; text-decoration: line-through; text-decoration-color: red;"><?=table[i][j].slice(0, -6); ?></td><?
+                    } else { ?>
+                      <td class="<?=className; ?>" style="text-align: center;"><?=table[i][j] ?></td><?
+                    }
                   } else {?>
                     <td class="<?=className; ?>" style="text-align: center;"><?=table[i][j]; ?></td><?
                   }
@@ -824,7 +915,7 @@
                 </tr><?
               }?>
           </table>
-          <table style="border: 1px solid black; border-collapse: collapse; width: 100%; margin-top: 8%;">
+          <table class="table_group" style="border: 1px solid black; border-collapse: collapse; width: 100%; margin-top: 8%;">
             <tr style="background: lightgray;">
             <? if (crew == "A_C") { ?>
               <th>C crew</th>
@@ -850,9 +941,16 @@
                 <tr><?
                 for (var j = 0; j < 7; j++) {
                   var className = makeClassName(i, j, a_c, b_d, "second", totalSlots[0][19], totalSlots[1][19], totalSlots[2][19], totalSlots[3][19]);
-                  if (table[i][j] && table[i][j].indexOf("yellow") > -1) {
-                    ?>
-                    <td class="<?=className; ?>" style="text-align: center; background: yellow;"><?=table[i][j].slice(0, -6); ?></td><?
+                  if (table[i][j]) {
+                    if (table[i][j].indexOf("yellow") > -1) { ?>
+                      <td class="<?=className; ?>" style="text-align: center; background: yellow;"><?=table[i][j].slice(0, -6); ?></td><?  
+                    } else if (table[i][j].indexOf("strike") > -1) { ?>
+                      <td class="<?=className; ?>" style="text-align: center; text-decoration: line-through; text-decoration-color: red;"><?=table[i][j].slice(0, -6); ?></td><?
+                    } else if (table[i][j].indexOf("ye_str") > -1) { ?>
+                      <td class="<?=className; ?>" style="text-align: center; background: yellow; text-decoration: line-through; text-decoration-color: red;"><?=table[i][j].slice(0, -6); ?></td><?
+                    } else { ?>
+                      <td class="<?=className; ?>" style="text-align: center;"><?=table[i][j] ?></td><?
+                    }
                   } else {?>
                     <td class="<?=className; ?>" style="text-align: center;"><?=table[i][j]; ?></td><?
                   }
@@ -911,9 +1009,16 @@
                         <tr><?
                         for (var j = 0; j < 7; j++) {
                           var className = makeClassName(i, j, next_a_c, next_b_d, "first", totalSlots[0][21], totalSlots[1][21], totalSlots[2][21], totalSlots[3][21]);
-                          if (table[i][j] && table[i][j].indexOf("yellow") > -1) {
-                            ?>
-                            <td class="<?=className; ?>" style="text-align: center; background: yellow;"><?=table[i][j].slice(0, -6); ?></td><?
+                          if (table[i][j]) {
+                            if (table[i][j].indexOf("yellow") > -1) { ?>
+                              <td class="<?=className; ?>" style="text-align: center; background: yellow;"><?=table[i][j].slice(0, -6); ?></td><?  
+                            } else if (table[i][j].indexOf("strike") > -1) { ?>
+                              <td class="<?=className; ?>" style="text-align: center; text-decoration: line-through; text-decoration-color: red;"><?=table[i][j].slice(0, -6); ?></td><?
+                            } else if (table[i][j].indexOf("ye_str") > -1) { ?>
+                              <td class="<?=className; ?>" style="text-align: center; background: yellow; text-decoration: line-through; text-decoration-color: red;"><?=table[i][j].slice(0, -6); ?></td><?
+                            } else { ?>
+                              <td class="<?=className; ?>" style="text-align: center;"><?=table[i][j] ?></td><?
+                            }
                           } else {?>
                             <td class="<?=className; ?>" style="text-align: center;"><?=table[i][j]; ?></td><?
                           }
@@ -947,9 +1052,16 @@
                         <tr><?
                         for (var j = 0; j < 7; j++) {
                           var className = makeClassName(i, j, next_a_c, next_b_d, "second", totalSlots[0][21], totalSlots[1][21], totalSlots[2][21], totalSlots[3][21]);
-                          if (table[i][j] && table[i][j].indexOf("yellow") > -1) {
-                            ?>
-                            <td class="<?=className; ?>" style="text-align: center; background: yellow;"><?=table[i][j].slice(0, -6); ?></td><?
+                          if (table[i][j]) {
+                            if (table[i][j].indexOf("yellow") > -1) { ?>
+                              <td class="<?=className; ?>" style="text-align: center; background: yellow;"><?=table[i][j].slice(0, -6); ?></td><?  
+                            } else if (table[i][j].indexOf("strike") > -1) { ?>
+                              <td class="<?=className; ?>" style="text-align: center; text-decoration: line-through; text-decoration-color: red;"><?=table[i][j].slice(0, -6); ?></td><?
+                            } else if (table[i][j].indexOf("ye_str") > -1) { ?>
+                              <td class="<?=className; ?>" style="text-align: center; background: yellow; text-decoration: line-through; text-decoration-color: red;"><?=table[i][j].slice(0, -6); ?></td><?
+                            } else { ?>
+                              <td class="<?=className; ?>" style="text-align: center;"><?=table[i][j] ?></td><?
+                            }
                           } else {?>
                             <td class="<?=className; ?>" style="text-align: center;"><?=table[i][j]; ?></td><?
                           }
@@ -980,6 +1092,44 @@
       window.frames['print_frame'].document.body.innerHTML = htmlToPrint;
       window.frames["print_frame"].window.focus();
       window.frames["print_frame"].window.print();
+    }
+    function tableToArray(table) {
+      var result = []
+      var rows = table.rows;
+      var cells, t;
+
+      // Iterate over rows
+      for (var i = 0; i <  rows.length; i ++) {
+        cells = rows[i].cells;
+        t = [];
+
+        // Iterate over cells
+        for (var j=0; j < cells.length; j++) {
+          t.push(cells[j].textContent);
+        }
+        result.push(t);
+      }
+      return result; 
+    }
+    var now = new Date();
+    if (now.getDay() == 0) {
+      var rollFedABTable = tableToArray(document.getElementsByClassName('table_group')[0]);
+      var rollFedCDTable = tableToArray(document.getElementsByClassName('table_group')[1]);
+      var rollFedArray = rollFedABTable.concat(rollFedCDTable);
+
+      var inlineABTable = tableToArray(document.getElementsByClassName('table_group')[2]);
+      var inlineCDTable = tableToArray(document.getElementsByClassName('table_group')[3]);
+      var inlineArray = inlineABTable.concat(inlineCDTable);
+
+      var ecoStarABTable = tableToArray(document.getElementsByClassName('table_group')[4]);
+      var ecoStarCDTable = tableToArray(document.getElementsByClassName('table_group')[5]);
+      var ecoStarArray = ecoStarABTable.concat(ecoStarCDTable);
+
+      var northPlantABTable = tableToArray(document.getElementsByClassName('table_group')[6]);
+      var northPlantCDTable = tableToArray(document.getElementsByClassName('table_group')[7]);
+      var northPlantArray = northPlantABTable.concat(northPlantCDTable);
+
+      google.script.run.downloadData(rollFedArray, inlineArray, ecoStarArray, northPlantArray);
     }
   </script>
 </html>
