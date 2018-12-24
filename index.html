@@ -1093,43 +1093,5 @@
       window.frames["print_frame"].window.focus();
       window.frames["print_frame"].window.print();
     }
-    function tableToArray(table) {
-      var result = []
-      var rows = table.rows;
-      var cells, t;
-
-      // Iterate over rows
-      for (var i = 0; i <  rows.length; i ++) {
-        cells = rows[i].cells;
-        t = [];
-
-        // Iterate over cells
-        for (var j=0; j < cells.length; j++) {
-          t.push(cells[j].textContent);
-        }
-        result.push(t);
-      }
-      return result; 
-    }
-    var now = new Date();
-    if (now.getDay() == 0) {
-      var rollFedABTable = tableToArray(document.getElementsByClassName('table_group')[0]);
-      var rollFedCDTable = tableToArray(document.getElementsByClassName('table_group')[1]);
-      var rollFedArray = rollFedABTable.concat(rollFedCDTable);
-
-      var inlineABTable = tableToArray(document.getElementsByClassName('table_group')[2]);
-      var inlineCDTable = tableToArray(document.getElementsByClassName('table_group')[3]);
-      var inlineArray = inlineABTable.concat(inlineCDTable);
-
-      var ecoStarABTable = tableToArray(document.getElementsByClassName('table_group')[4]);
-      var ecoStarCDTable = tableToArray(document.getElementsByClassName('table_group')[5]);
-      var ecoStarArray = ecoStarABTable.concat(ecoStarCDTable);
-
-      var northPlantABTable = tableToArray(document.getElementsByClassName('table_group')[6]);
-      var northPlantCDTable = tableToArray(document.getElementsByClassName('table_group')[7]);
-      var northPlantArray = northPlantABTable.concat(northPlantCDTable);
-
-      google.script.run.downloadData(rollFedArray, inlineArray, ecoStarArray, northPlantArray);
-    }
   </script>
 </html>

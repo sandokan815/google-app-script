@@ -73,7 +73,7 @@
     if (day == 0) {
         day = 7;
     }
-    var monday = new Date(today.setDate(today.getDate() - day + 1));
+    var monday = new Date(today.setDate(today.getDate() - day + diff));
     return monday;
   }
   
@@ -99,31 +99,37 @@
     for (var i = 0; i < data.length; i++) {
       var start = "";
       var last = "";
-      var absence = "";
+      var formated_absence = [];
       if (data[i][6]) {
-        start = new Date(new Date(data[i][6]).getTime() + 2 * 60* 60* 1000);
+        start = new Date(new Date(data[i][6]).getTime() + 2 * 60 * 60 * 1000);
       }
       if (data[i][9]) {
-        last = new Date(new Date(data[i][9]).getTime() + 2 * 60* 60* 1000);
+        last = new Date(new Date(data[i][9]).getTime() + 2 * 60 * 60 * 1000);
       }
-      if (data[i][10]) {
-        absence = new Date(new Date(data[i][10]).getTime() + 2 * 60* 60* 1000);
+      if (data[i][10]) {        
+        if (data[i][10].toString().indexOf(';') > -1) {
+          formated_absence = data[i][10];
+        } else {
+          var absence = new Date(new Date(data[i][10]).getTime() + 2 * 60 * 60 * 1000);
+          formated_absence = Utilities.formatDate(absence, "CST", "MM/dd/Y");
+        }
       }
       if (start && data[i][3] == dept && data[i][4] == crew){
         if (!last || last > date) {
+          var formated_date = Utilities.formatDate(date, "CST", "MM/dd/Y");
           if (start < date) {
-            if (absence > date || absence < date) {
-              person.push(data[i][1] + " " + data[i][2]);
-            } else {
+            if (formated_absence.indexOf(formated_date) > -1) {
               person.push(data[i][1] + " " + data[i][2] + 'strike');  
+            } else {
+              person.push(data[i][1] + " " + data[i][2]);
             }
           } else if (start > date) {
             continue;
           } else {
-            if (absence > date || absence < date) {
-              person.push(data[i][1] + " " + data[i][2] + 'yellow')
-            } else {
+            if (formated_absence && formated_absence.toString().indexOf(formated_date) > -1) {
               person.push(data[i][1] + " " + data[i][2] + 'ye_str');
+            } else {
+              person.push(data[i][1] + " " + data[i][2] + 'yellow')
             }
           }
         }
@@ -192,14 +198,55 @@
     }
     return table;
   }
-
-function downloadData(rollFedArray, inlineArray, ecoStarArray, northPlantArray){
+function makeArrayFromTable(dept, length_AB, length_CD) {
+  var crew = detectCrew(new Date());
+  var week = getWeek(1);
+  var data = getDataSortName();
+  
+  var table_data = [];
+  var week_head = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
+  var date_head = [];
+  for (var i in week) {
+    date_head.push(Utilities.formatDate(week[i], "CST", "MM/dd/YY"));
+  }
+  if (crew == "A_C") {
+    var first_crew_head = ['A Crew', 'A Crew', 'B Crew', 'B Crew', 'A Crew', 'A Crew', 'A Crew'];
+    var second_crew_head = ['C Crew', 'C Crew', 'D Crew', 'D Crew', 'C Crew', 'C Crew', 'C Crew'];
+  }
+  if (crew == "B_D") {
+    var first_crew_head = ['B Crew', 'B Crew', 'A Crew', 'A Crew', 'B Crew', 'B Crew', 'B Crew'];
+    var second_crew_head = ['C Crew', 'C Crew', 'D Crew', 'D Crew', 'C Crew', 'C Crew', 'C Crew'];
+  }
+  
+  var top_persons = make_persons(crew, dept, week, data, 'first');
+  var bottom_persons = make_persons(crew, dept, week, data, 'second');
+  
+  var top_table = create_table(top_persons, length_AB);
+  var bottom_table = create_table(bottom_persons, length_CD);
+  
+  table_data.push(week_head, date_head, first_crew_head);
+  for (var i in top_table) {
+    table_data.push(top_table[i]);
+  }
+  table_data.push(second_crew_head)
+  for (var i in bottom_table) {
+    table_data.push(bottom_table[i])
+  }
+  return table_data;
+}
+function downloadData(){
   var spreadsheetId = '1Ojl9dNq24dm6JkgB5GEOVZlsTL7k5LNT2F1FIwDKuJ4';
-  var sheetName = '23/12/2018';
+  var sheetName = Utilities.formatDate(firstOfWeek(1), "CST", "MM/dd/YY")
   var activeSpreadsheet = SpreadsheetApp.openById(spreadsheetId);
   var newSheet = activeSpreadsheet.getSheetByName(sheetName);
   
   var length = get_length(getTotalSlots());
+
+  var rollFedArray = makeArrayFromTable("Roll Fed", length.rollFedCurAB, length.rollFedCurCD);
+  var inlineArray = makeArrayFromTable("Inline", length.inlineCurAB, length.inlineCurCD);
+  var ecoStarArray = makeArrayFromTable("Eco Star", length.ecoStarCurAB, length.ecoStarCurCD);
+  var northPlantArray = makeArrayFromTable("North Plant", length.northPlantCurAB, length.northPlantCurCD);
+
   var rollFedLen = length.rollFedCurAB + length.rollFedCurCD + 4;
   var inlineLen = length.inlineCurAB + length.inlineCurCD + 4;
   var ecoStarLen = length.ecoStarCurAB + length.ecoStarCurCD + 4;
