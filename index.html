@@ -55,8 +55,8 @@
     button:hover {
       background: #07c;
     }
-    table th, td {
-		border: 1px solid black;
+    table th {
+	border: 1px solid black;
     color: black;
     padding: 3px;
 	}
@@ -68,6 +68,9 @@
     text-align: center;
 	}
     td {
+      border: none;
+      color: black;
+      padding: 3px;
       height: 25px;
     }
     h1 {
@@ -90,21 +93,20 @@
       top: 81%;
     }
     .full {
-      border: 2px solid red;
+      border: 1px solid black;
     }
     .top {
-      border-top: 2px solid red;
-      border-left: 2px solid red;
-      border-right: 2px solid red;
+      border-top: 1px solid black;
+      border-left: 1px solid black;
+      border-right: 1px solid black;
     }
     .medium {
-      border-left: 2px solid red;
-      border-right: 2px solid red;
+      border: 1px solid black;
     }
     .bottom {
-      border-bottom: 2px solid red;
-      border-left: 2px solid red;
-      border-right: 2px solid red;
+      border-bottom: 1px solid black;
+      border-left: 1px solid black;
+      border-right: 1px solid black;
     }
 </style>
   </head>
@@ -137,7 +139,7 @@
       var first = new Date();
       first.setHours(0,0,0,0);
 			var last = new Date(first.getTime() + 8 * 24 * 60 * 60 * 1000); ?>
-            <h2>For<?= Utilities.formatDate(first, "CST", "EEEE, MMM dd")?> - <?= Utilities.formatDate(last, "CST", "EEEE, MMM dd")?></h2>
+            <h2>For&nbsp; <?= Utilities.formatDate(first, "CST", "EEEE, MMM dd")?> - <?= Utilities.formatDate(last, "CST", "EEEE, MMM dd")?></h2>
 			<div class="window1"><?
 				for (var i = 0; i < dataForNew.length; i++) {
                 var start = new Date(new Date(dataForNew[i][6]).getTime() + 2 * 60 * 60 * 1000);
@@ -166,7 +168,7 @@
             <label style="background: orange; font-size: 25px;">Roll Fed</label>
             <label style="font-size: 25px;">Week of: <?= Utilities.formatDate(firstOfWeek(1), "CST", "MM/dd/YY") ?></label>
           </div>
-          <table class="table_group" style="border: 1px solid black; border-collapse: collapse; width: 100%;">
+          <table class="table_group" style="border-collapse: collapse; width: 100%;">
             <tr>
               <th>Monday</th>	
               <th>Tuesday</th>
@@ -223,7 +225,7 @@
                 </tr><?
               }?>
           </table>
-          <table class="table_group" style="border: 1px solid black; border-collapse: collapse; width: 100%; margin-top: 8%;">
+          <table class="table_group" style="border-collapse: collapse; width: 100%; margin-top: 8%;">
             <tr style="background: lightgray;">
             <? if (crew == "A_C") { ?>
               <th>C crew</th>
@@ -277,7 +279,7 @@
                 <label style="font-size: 25px;">Week of: <?= Utilities.formatDate(firstOfWeek(8), "CST", "MM/dd/YY") ?></label>
               </div>
               <div>
-                <table style="border: 1px solid black; border-collapse: collapse; width: 100%;">
+                <table style="border-collapse: collapse; width: 100%;">
                   <tr>
                     <th>Monday</th>	
                     <th>Tuesday</th>
@@ -334,7 +336,7 @@
                       </tr><?
                     }?>
                 </table>
-                <table style="border: 1px solid black; border-collapse: collapse; width: 100%; margin-top: 8%;">
+                <table style=" border-collapse: collapse; width: 100%; margin-top: 8%;">
                   <tr style="background: lightgray;">
                     <?if (nextCrew == "A_C") { ?>
                       <th>C crew</th>
@@ -396,7 +398,7 @@
             <label style="background: green; font-size: 25px;">Inline</label>
             <label style="font-size: 25px;">Week of: <?= Utilities.formatDate(firstOfWeek(1), "CST", "MM/dd/YY") ?></label>
           </div>
-          <table class="table_group" style="border: 1px solid black; border-collapse: collapse; width: 100%;">
+          <table class="table_group" style=" border-collapse: collapse; width: 100%;">
             <tr>
               <th>Monday</th>	
               <th>Tuesday</th>
@@ -453,7 +455,7 @@
                 </tr><?
               }?>
           </table>
-          <table class="table_group" style="border: 1px solid black; border-collapse: collapse; width: 100%; margin-top: 8%;">
+          <table class="table_group" style=" border-collapse: collapse; width: 100%; margin-top: 8%;">
             <tr style="background: lightgray;">
               <? if (crew == "A_C") { ?>
                 <th>C crew</th>
@@ -507,7 +509,7 @@
                   <label style="font-size: 25px;">Week of: <?= Utilities.formatDate(firstOfWeek(8), "CST", "MM/dd/YY") ?></label>
                 </div>
                 <div>
-                  <table style="border: 1px solid black; border-collapse: collapse; width: 100%;">
+                  <table style=" border-collapse: collapse; width: 100%;">
                     <tr>
                       <th>Monday</th>	
                       <th>Tuesday</th>
@@ -564,7 +566,7 @@
                         </tr><?
                       }?>
                   </table>
-                  <table style="border: 1px solid black; border-collapse: collapse; width: 100%; margin-top: 8%;">
+                  <table style=" border-collapse: collapse; width: 100%; margin-top: 8%;">
                     <tr style="background: lightgray;">
                       <? if (nextCrew == "A_C") { ?>
                         <th>C crew</th>
@@ -627,7 +629,7 @@
             <label style="background: cyan; font-size: 25px;">Eco Star</label>
             <label style="font-size: 25px;">Week of: <?= Utilities.formatDate(firstOfWeek(1), "CST", "MM/dd/YY") ?></label>
           </div>
-          <table class="table_group" style="border: 1px solid black; border-collapse: collapse; width: 100%;">
+          <table class="table_group" style=" border-collapse: collapse; width: 100%;">
             <tr>
               <th>Monday</th>	
               <th>Tuesday</th>
@@ -684,7 +686,7 @@
                 </tr><?
               }?>
           </table>
-          <table class="table_group" style="border: 1px solid black; border-collapse: collapse; width: 100%; margin-top: 8%;">
+          <table class="table_group" style=" border-collapse: collapse; width: 100%; margin-top: 8%;">
             <tr style="background: lightgray;">
             <? if (crew == "A_C") { ?>
               <th>C crew</th>
@@ -738,7 +740,7 @@
                   <label style="font-size: 25px;">Week of: <?= Utilities.formatDate(firstOfWeek(8), "CST", "MM/dd/YY") ?></label>
                 </div>
                 <div>
-                  <table style="border: 1px solid black; border-collapse: collapse; width: 100%;">
+                  <table style=" border-collapse: collapse; width: 100%;">
                     <tr>
                       <th>Monday</th>	
                       <th>Tuesday</th>
@@ -795,7 +797,7 @@
                         </tr><?
                       }?>
                   </table>
-                  <table style="border: 1px solid black; border-collapse: collapse; width: 100%; margin-top: 8%;">
+                  <table style=" border-collapse: collapse; width: 100%; margin-top: 8%;">
                     <tr style="background: lightgray;">
                       <? if (nextCrew == "A_C") { ?>
                         <th>C crew</th>
@@ -858,7 +860,7 @@
             <label style="background: yellow; font-size: 25px;">North Plant</label>
             <label style="font-size: 25px;">Week of: <?= Utilities.formatDate(firstOfWeek(1), "CST", "MM/dd/YY") ?></label>
           </div>
-          <table class="table_group" style="border: 1px solid black; border-collapse: collapse; width: 100%;">
+          <table class="table_group" style=" border-collapse: collapse; width: 100%;">
             <tr>
               <th>Monday</th>	
               <th>Tuesday</th>
@@ -915,7 +917,7 @@
                 </tr><?
               }?>
           </table>
-          <table class="table_group" style="border: 1px solid black; border-collapse: collapse; width: 100%; margin-top: 8%;">
+          <table class="table_group" style=" border-collapse: collapse; width: 100%; margin-top: 8%;">
             <tr style="background: lightgray;">
             <? if (crew == "A_C") { ?>
               <th>C crew</th>
@@ -969,7 +971,7 @@
                   <label style="font-size: 25px;">Week of: <?= Utilities.formatDate(firstOfWeek(8), "CST", "MM/dd/YY") ?></label>
                 </div>
                 <div>
-                  <table style="border: 1px solid black; border-collapse: collapse; width: 100%;">
+                  <table style=" border-collapse: collapse; width: 100%;">
                     <tr>
                       <th>Monday</th>	
                       <th>Tuesday</th>
@@ -1026,7 +1028,7 @@
                         </tr><?
                       }?>
                   </table>
-                  <table style="border: 1px solid black; border-collapse: collapse; width: 100%; margin-top: 8%;">
+                  <table style=" border-collapse: collapse; width: 100%; margin-top: 8%;">
                     <tr style="background: lightgray;">
                       <? if (nextCrew == "A_C") { ?>
                         <th>C crew</th>
