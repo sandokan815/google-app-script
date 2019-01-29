@@ -4,7 +4,7 @@
       .setXFrameOptionsMode(HtmlService.XFrameOptionsMode.ALLOWALL);
   }
 
-  function getDataSortDate() {
+  function getEmployeesByDate() {
     return SpreadsheetApp
       .openById('1-HmBSO0ViOWjC4ttaAxOZ1sygnfWmKvMJBswBRyouQA')
       .getSheetByName('Form Responses 1')
@@ -12,7 +12,7 @@
       .sort(7)
       .getValues();
   }
-  function getDataSortName() {
+  function getEmployeesByName() {
     return SpreadsheetApp
       .openById('1-HmBSO0ViOWjC4ttaAxOZ1sygnfWmKvMJBswBRyouQA')
       .getSheetByName('Form Responses 1')
@@ -20,53 +20,27 @@
       .sort(3)
       .getValues();
   }
-  function getTotalSlots() {
+  function getFirstSchedule() {
     return SpreadsheetApp
       .openById('1-HmBSO0ViOWjC4ttaAxOZ1sygnfWmKvMJBswBRyouQA')
-      .getSheetByName('Form Responses 1')
-      .getRange(4, 2, 4, 23)
+      .getSheetByName('Daily Schedule')
+      .getRange(4, 2, 28, 10)
       .getValues();
   }
-  function detectCrew(now) {
-    var first = new Date(now.getFullYear(), 0, 1);
-    var weekNo = Math.ceil( (((now - first) / 86400000) + first.getDay() + 1) / 7 );
-    if (now.getDay() == 0) {
-      weekNo = weekNo - 1;
-    }
-    if (weekNo % 2 == 0) {
-      return "A_C";
-    } else {
-      return "B_D";
-    }
+  function getSecondSchedule() {
+    return SpreadsheetApp
+      .openById('1-HmBSO0ViOWjC4ttaAxOZ1sygnfWmKvMJBswBRyouQA')
+      .getSheetByName('Eco, North & Warehouse Schedule')
+      .getRange(4, 2, 13, 15)
+      .getValues();
   }
-  function makeClassName(i, j, a_c, b_d, order, num_a, num_b, num_c, num_d) {
-    var className = "";
-    var num = 0;
-    if (a_c.indexOf(j) > -1) {
-      if (order == "first") {
-        num = num_a;
-      } else {
-        num = num_c;
-      }
-    } else if (b_d.indexOf(j) > -1) {
-      if (order == "first") {
-        num = num_b;
-      } else {
-        num = num_d;
-      }
+  function getMonday(week) {
+    if (week == 'current') {
+      var diff = 1;
     }
-    if (i != 0 && i == num - 1) {
-        className = "bottom";
-    } else if (i != 0 && i < num - 1) {
-        className = "medium";
-    } else if (i == 0 && i == num - 1) {
-        className = "full";
-    } else if (i == 0 && i < num - 1) {
-        className = "top";
+    if (week == 'next') {
+      var diff = 8;
     }
-    return className
-  }
-  function firstOfWeek(diff) {
     var now = new Date();
     var today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
     var day = today.getDay();
@@ -76,7 +50,6 @@
     var monday = new Date(today.setDate(today.getDate() - day + diff));
     return monday;
   }
-  
   function getWeek(diff) {
     var curr = new Date();
     var day = curr.getDay();
@@ -93,7 +66,18 @@
     }
     return week;
   }
-  
+  function detectCrew(date) {
+    var first = new Date(date.getFullYear(), 0, 1);
+    var weekNo = Math.ceil( (((date - first) / 86400000) + first.getDay() + 1) / 7 );
+    if (date.getDay() == 0) {
+      weekNo = weekNo - 1;
+    }
+    if (weekNo % 2 == 0) {
+      return "A_C";
+    } else {
+      return "B_D";
+    }
+  }
   function filtered_person(dept, crew, date, data) {
     var person = [];
     for (var i = 0; i < data.length; i++) {
@@ -158,122 +142,3 @@
     }
     return persons;
   }
-  function get_length(totalSlots) {
-    var length = {};
-    length.rollFedCurAB = Math.max(totalSlots[0][9], totalSlots[1][9]);
-    length.rollFedCurCD = Math.max(totalSlots[2][9], totalSlots[3][9]);
-    length.rollFedNextAB = Math.max(totalSlots[0][11], totalSlots[1][11]);
-    length.rollFedNextCD = Math.max(totalSlots[2][11], totalSlots[3][11]);
-
-    length.inlineCurAB = Math.max(totalSlots[0][2], totalSlots[1][2]);
-    length.inlineCurCD = Math.max(totalSlots[2][2], totalSlots[3][2]);
-    length.inlineNextAB = Math.max(totalSlots[0][4], totalSlots[1][4]);
-    length.inlineNextCD = Math.max(totalSlots[2][4], totalSlots[3][4]);
-
-    length.ecoStarCurAB = Math.max(totalSlots[0][14], totalSlots[1][14]);
-    length.ecoStarCurCD = Math.max(totalSlots[2][14], totalSlots[3][14]);
-    length.ecoStarNextAB = Math.max(totalSlots[0][16], totalSlots[1][16]);
-    length.ecoStarNextCD = Math.max(totalSlots[2][16], totalSlots[3][16]);
-
-    length.northPlantCurAB = Math.max(totalSlots[0][19], totalSlots[1][19]);
-    length.northPlantCurCD = Math.max(totalSlots[2][19], totalSlots[3][19]);
-    length.northPlantNextAB = Math.max(totalSlots[0][21], totalSlots[1][21]);
-    length.northPlantNextCD = Math.max(totalSlots[2][21], totalSlots[3][21]);
-
-    return length;
-  }
-  function create_table(persons, max_length) {
-    var table = new Array(7);
-    for (var i = 0; i < max_length; i++) {
-      table[i] = new Array();
-    }
-    for (var i=0; i<max_length; i++) {
-      for (var j=0; j<persons.length; j++) {
-        if (persons[j][i]) {
-          table[i][j] = persons[j][i];
-        } else {
-          table[i][j] = null;
-        }
-      }
-    }
-    return table;
-  }
-function makeArrayFromTable(dept, length_AB, length_CD) {
-  var crew = detectCrew(new Date());
-  var week = getWeek(1);
-  var data = getDataSortName();
-  
-  var table_data = [];
-  var week_head = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
-  var date_head = [];
-  for (var i in week) {
-    date_head.push(Utilities.formatDate(week[i], "CST", "MM/dd/YY"));
-  }
-  if (crew == "A_C") {
-    var first_crew_head = ['A Crew', 'A Crew', 'B Crew', 'B Crew', 'A Crew', 'A Crew', 'A Crew'];
-    var second_crew_head = ['C Crew', 'C Crew', 'D Crew', 'D Crew', 'C Crew', 'C Crew', 'C Crew'];
-  }
-  if (crew == "B_D") {
-    var first_crew_head = ['B Crew', 'B Crew', 'A Crew', 'A Crew', 'B Crew', 'B Crew', 'B Crew'];
-    var second_crew_head = ['C Crew', 'C Crew', 'D Crew', 'D Crew', 'C Crew', 'C Crew', 'C Crew'];
-  }
-  
-  var top_persons = make_persons(crew, dept, week, data, 'first');
-  var bottom_persons = make_persons(crew, dept, week, data, 'second');
-  
-  var top_table = create_table(top_persons, length_AB);
-  var bottom_table = create_table(bottom_persons, length_CD);
-  
-  table_data.push(week_head, date_head, first_crew_head);
-  for (var i in top_table) {
-    table_data.push(top_table[i]);
-  }
-  table_data.push(second_crew_head)
-  for (var i in bottom_table) {
-    table_data.push(bottom_table[i])
-  }
-  return table_data;
-}
-function downloadData(){
-  var spreadsheetId = '1Ojl9dNq24dm6JkgB5GEOVZlsTL7k5LNT2F1FIwDKuJ4';
-  var sheetName = Utilities.formatDate(firstOfWeek(1), "CST", "MM/dd/YY")
-  var activeSpreadsheet = SpreadsheetApp.openById(spreadsheetId);
-  var newSheet = activeSpreadsheet.getSheetByName(sheetName);
-  
-  var length = get_length(getTotalSlots());
-
-  var rollFedArray = makeArrayFromTable("Roll Fed", length.rollFedCurAB, length.rollFedCurCD);
-  var inlineArray = makeArrayFromTable("Inline", length.inlineCurAB, length.inlineCurCD);
-  var ecoStarArray = makeArrayFromTable("Eco Star", length.ecoStarCurAB, length.ecoStarCurCD);
-  var northPlantArray = makeArrayFromTable("North Plant", length.northPlantCurAB, length.northPlantCurCD);
-
-  var rollFedLen = length.rollFedCurAB + length.rollFedCurCD + 4;
-  var inlineLen = length.inlineCurAB + length.inlineCurCD + 4;
-  var ecoStarLen = length.ecoStarCurAB + length.ecoStarCurCD + 4;
-  var northPlantLen = length.northPlantCurAB + length.northPlantCurCD + 4;
-  
-  var rollFedRange = 'B2:H' + (rollFedLen + 1);
-  var inlineRange = 'B'+ (rollFedLen + 2) + ':H' + (rollFedLen + inlineLen + 1);
-  var ecoStarRange = 'B'+ (rollFedLen + inlineLen + 3) + ':H' + (rollFedLen + inlineLen + ecoStarLen + 2);
-  var northPlantRange = 'B'+ (rollFedLen + inlineLen + ecoStarLen + 4) + ':H' + (rollFedLen + inlineLen + ecoStarLen + northPlantLen + 3);
-
-  if (newSheet == null) {
-    newSheet = activeSpreadsheet.insertSheet();
-    newSheet.setName(sheetName);
-    //RollFed
-    newSheet.getRange('A1').setValue('RollFed');
-    newSheet.getRange(rollFedRange).setValues(rollFedArray);
-    //Inline
-    newSheet.getRange('A'+ (rollFedLen + 1)).setValue('Inline');
-    newSheet.getRange(inlineRange).setValues(inlineArray);
-    //Eco Star
-    newSheet.getRange('A'+ (rollFedLen + inlineLen + 2)).setValue('Eco Star');
-    newSheet.getRange(ecoStarRange).setValues(ecoStarArray);
-    //North Plant
-    newSheet.getRange('A'+ (rollFedLen + inlineLen + ecoStarLen + 3)).setValue('North Plant');
-    newSheet.getRange(northPlantRange).setValues(northPlantArray);
-    return true;
-  } else {
-    return false;
-  }
-}
