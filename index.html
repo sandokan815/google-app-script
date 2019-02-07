@@ -2,101 +2,111 @@
 <html>
   <head>
     <base target="_top">
-    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
-    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
-    <style>
-      body {
-        background: #d9d9d9;
-      }
-      .new_starts {
-        border-style: ridge;
-        height: 585px;
-        width: 970px;
-        overflow-y: scroll;
-        display: flex;
-        flex-wrap: wrap;
-        margin: 1% 10%;
+    <head>
+      <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+      <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+      <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+    </head>
+    <style type="text/css">
+    .window1 {
+		border-style: ridge;
+		height: 585px;
+		width: 970px;
+		overflow-y: scroll;
+		display: flex;
+		flex-wrap: wrap;
+		margin: 1% 10%;
         background: white;
-      }
-      .flex-container {
-        display: flex;
-        flex-direction: column;
-        margin: 9px;
-        text-align: left;
-      }
-      img {
-        width: 215px;
-        height: 150px;
-        margin-bottom: 20px;
-      }
-      table th {
-        border: 1px solid black;
-        color: black;
-        padding: 3px;
-      }
-      table {
-        width: 100%;
-      }
-      th {
-        width: 14.3%;
-        text-align: center;
-      }
-      td {
-        border: none;
-        color: black;
-        padding: 3px;
-        height: 25px;
-      }
-      h1 {
-        color: white;
-        margin-bottom: 0px;
-      }
-      .button-group {
-        width: 1020px;
-        text-align: right;
-      }
-      button {
-        background: #0095ff;
-        border-color: #07c;
-        width: 90px;
-        height: 30px;
-        color: white;
-        border-radius: 3px;
-        font-weight: bold;
-        cursor: pointer;
-        margin-top: 10px;
-      }
-      button:hover {
-        background: #07c;
-      }
-      .window {
-        border-style: ridge;
-        height: 585px;
-        width: 970px;
-        overflow-y: scroll;
-        margin: 1% 10%;
+	}
+    .window {
+		border-style: ridge;
+		height: 585px;
+		width: 970px;
+		overflow-y: scroll;
+		margin: 1% 10%;
         background: white;
-      }
-      .modal-dialog {
-        width: 800px;
-      }
-      .first_table {
-        border-collapse: collapse;
-        width: 100%;
-      }
-      .second_table {
-        border-collapse: collapse;
-        width: 100%;
-        margin-top: 8%;
-      }
-    </style>
+	}
+	.flex-container {
+		display: flex;
+		flex-direction: column;
+		margin: 8px;
+		text-align: left;
+	}
+	img {
+		width: 220px;
+		height: 165px;
+		margin-bottom: 20px;
+	}
+    .button-group {
+      width: 1020px;
+      text-align: right;
+    }
+    button {
+      background: #0095ff;
+      border-color: #07c;
+      width: 90px;
+      height: 30px;
+      color: white;
+      border-radius: 3px;
+      font-weight: bold;
+      cursor: pointer;
+      margin-top: 10px;
+    }
+    button:hover {
+      background: #07c;
+    }
+    table th {
+	border: 1px solid black;
+    color: black;
+    padding: 3px;
+	}
+    table {
+      width: 100%;
+    }
+	th {
+		width: 14.3%;
+    text-align: center;
+	}
+    td {
+      border: none;
+      color: black;
+      padding: 3px;
+      height: 25px;
+    }
+    h1 {
+      color: white;
+      margin-bottom: 0px;
+    }
+    .modal-dialog {
+      width: 800px;
+    }
+    .rollFed {
+      top: 22%;
+    }
+    .inline {
+      top: 42%;
+    }
+    .ecoStar {
+      top: 61%;
+    }
+    .northPlant {
+      top: 81%;
+    }
+    .outside {
+      border: none;
+    }
+    .normal {
+      border: 1px solid black;
+    }
+</style>
   </head>
-  <body><?
-    var dataForNewStarts = getEmployeesByDate();
-    var dataForCurrent = getEmployeesByName();
+  <body style="background: #d9d9d9;"><?
+    var dataForCurrent = getDataSortName();
+    var dataForNew = getDataSortDate();
     var firstSchedule = getFirstSchedule();
-    var secondSchedule = getSecondSchedule();
+    //var secondSchedule = getSecondSchedule();
+    var firstLength = get_first_length(firstSchedule);
+    //var secondLength = get_second_length(secondSchedule);
     var crew = detectCrew(new Date());
     var nextToday = new Date();
     nextToday.setDate(nextToday.getDate() + 7);
@@ -114,27 +124,28 @@
     } else if (nextCrew == "B_D") {
       var next_a_c = [2, 3];
       var next_b_d = [0, 1, 4, 5, 6];
-    } ?>
-    <div align="center">
-      <h1>New Start Roster</h1><?
+    }
+    ?>
+    <div id="new_start" align="center">
+			<h1>New Start Roster</h1><?
       var first = new Date();
       first.setHours(0,0,0,0);
-      var last = new Date(first.getTime() + 8 * 24 * 60 * 60 * 1000); ?>
-      <h2>For&nbsp; <?= Utilities.formatDate(first, "CST", "EEEE, MMM dd")?> - <?= Utilities.formatDate(last, "CST", "EEEE, MMM dd")?></h2>
-      <div class="new_starts"><?
-        for (var i = 0; i < dataForNewStarts.length; i++) {
-          var start = new Date(new Date(dataForNewStarts[i][6]).getTime() + 2 * 60 * 60 * 1000);
-          if (start >= first && start < last) {?>
-          <div class="flex-container">
-            <img src="<?= dataForNewStarts[i][8].replace("open", "uc");?>" >
-            <label style="font-weight: bold;"> Start Date : <?= Utilities.formatDate(dataForNewStarts[i][6], "CST", "EEEE, MMM dd") ?></label>
-            <label> Name: <?= dataForNewStarts[i][1] + ' ' + dataForNewStarts[i][2] ?></label>
-            <label> Shift: <?= dataForNewStarts[i][4] ?></label>
-            <label> Dept: <?= dataForNewStarts[i][3] ?></label>
-          </div><?
-          }
-        }?>
-      </div>
+			var last = new Date(first.getTime() + 8 * 24 * 60 * 60 * 1000); ?>
+            <h2>For&nbsp; <?= Utilities.formatDate(first, "CST", "EEEE, MMM dd")?> - <?= Utilities.formatDate(last, "CST", "EEEE, MMM dd")?></h2>
+			<div class="window1"><?
+				for (var i = 0; i < dataForNew.length; i++) {
+                var start = new Date(new Date(dataForNew[i][6]).getTime() + 2 * 60 * 60 * 1000);
+					if (start >= first && start < last) {?>
+						<div class="flex-container">
+							<img src="<?= dataForNew[i][8].replace("open", "uc");?>" >
+							<label style="font-weight: bold;"> Start Date : <?= Utilities.formatDate(dataForNew[i][6], "CST", "EEEE, MMM dd") ?></label>
+							<label> Name: <?= dataForNew[i][1] + ' ' + dataForNew[i][2] ?></label>
+							<label> Shift: <?= dataForNew[i][4] ?></label>
+							<label> Dept: <?= dataForNew[i][3] ?></label>
+						</div> <?
+					}
+				} ?>
+			</div>
     </div>
     <div align="center">
       <h1>Current Roster - Roll Fed</h1>
@@ -142,69 +153,478 @@
         <button data-toggle="modal" data-target="#rollFedNextWeek">Next Week</button>
         <button onclick="htmlToPDF('roll_fed')">Print</button>
       </div>
-      <div class="window" id="roll_fed">
-        <div style="display: flex; flex-direction: column; width: 100%;" align="center">
-          <label style="background: orange; font-size: 25px;">Roll Fed</label>
-          <label style="font-size: 25px;">Week of: <?= Utilities.formatDate(getMonday('current'), "CST", "MM/dd/YY") ?></label>
+      
+      <div class="window">
+      	<div id="roll_fed">
+          <div style="display: flex; flex-direction: column; width: 100%;" align="center">
+            <label style="background: orange; font-size: 25px;">Roll Fed</label>
+            <label style="font-size: 25px;">Week of: <?= Utilities.formatDate(firstOfWeek(1), "CST", "MM/dd/YY") ?></label>
+          </div>
+          <table class="table_group" style="border-collapse: collapse; width: 100%;">
+            <tr>
+              <th>Monday</th>	
+              <th>Tuesday</th>
+              <th>Wednesday</th>
+              <th>Thursday</th>	
+              <th>Friday</th>
+              <th>Saturday</th>
+              <th>Sunday</th>
+            </tr>
+            <tr><? var week = getWeek(1);
+              for (var i in week) { ?>
+                <th><?= Utilities.formatDate(week[i], "CST", "MM/dd/YY") ?></th><?
+              } ?>
+            </tr>
+            <tr style="background: lightgray;">
+            <? if (crew == "A_C") {?>
+                <th>A crew</th>
+                <th>A crew</th>
+                <th>B crew</th>
+                <th>B crew</th>
+                <th>A crew</th>
+                <th>A crew</th>
+                <th>A crew</th>
+            <? } if (crew == "B_D") { ?>
+                <th>B crew</th>
+                <th>B crew</th>
+                <th>A crew</th>
+                <th>A crew</th>
+                <th>B crew</th>
+                <th>B crew</th>
+                <th>B crew</th>
+            <? } ?>
+            </tr><?
+              var persons = make_persons(crew, "Roll Fed", week, dataForCurrent, "first");
+              var table = create_table(persons, firstLength.rollCurAB);
+              for (var i = 0; i < firstLength.rollCurAB; i++) { ?>
+                <tr><?
+                for (var j = 0; j < 7; j++) {
+                  var className = makeClassName(i, j, "RollFed", crew, nextCrew, a_c, b_d, "first", firstSchedule);
+                  if (table[i][j]) {
+                    if (table[i][j].indexOf("yellow") > -1) { ?>
+                      <td class="<?=className; ?>" style="text-align: center; background: yellow;"><?=table[i][j].slice(0, -6); ?></td><?  
+                    } else if (table[i][j].indexOf("strike") > -1) { ?>
+                      <td class="<?=className; ?>" style="text-align: center; text-decoration: line-through; text-decoration-color: red;"><?=table[i][j].slice(0, -6); ?></td><?
+                    } else if (table[i][j].indexOf("ye_str") > -1) { ?>
+                      <td class="<?=className; ?>" style="text-align: center; background: yellow; text-decoration: line-through; text-decoration-color: red;"><?=table[i][j].slice(0, -6); ?></td><?
+                    } else { ?>
+                      <td class="<?=className; ?>" style="text-align: center;"><?=table[i][j] ?></td><?
+                    }
+                  } else {?>
+                    <td class="<?=className; ?>" style="text-align: center;"><?=table[i][j]; ?></td><?
+                  }
+                }?>
+                </tr><?
+              }?>
+          </table>
+          <table class="table_group" style="border-collapse: collapse; width: 100%; margin-top: 8%;">
+            <tr style="background: lightgray;">
+              <? if (crew == "A_C") { ?>
+                <th>C crew</th>
+                <th>C crew</th>
+                <th>D crew</th>
+                <th>D crew</th>
+                <th>C crew</th>
+                <th>C crew</th>
+                <th>C crew</th>
+              <? } if (crew == "B_D") { ?>
+                <th>D crew</th>
+                <th>D crew</th>
+                <th>C crew</th>
+                <th>C crew</th>
+                <th>D crew</th>
+                <th>D crew</th>
+                <th>D crew</th>
+              <? } ?>
+            </tr><?
+              var persons = make_persons(crew, "Roll Fed", week, dataForCurrent, "second");
+              var table = create_table(persons, firstLength.rollCurCD);
+              for (var i = 0; i < firstLength.rollCurCD; i++) { ?>
+                <tr><?
+                for (var j = 0; j < 7; j++) {
+                  var className = makeClassName(i, j, "RollFed", crew, nextCrew, a_c, b_d, "second", firstSchedule);
+                  if (table[i][j]) {
+                    if (table[i][j].indexOf("yellow") > -1) { ?>
+                      <td class="<?=className; ?>" style="text-align: center; background: yellow;"><?=table[i][j].slice(0, -6); ?></td><?  
+                    } else if (table[i][j].indexOf("strike") > -1) { ?>
+                      <td class="<?=className; ?>" style="text-align: center; text-decoration: line-through; text-decoration-color: red;"><?=table[i][j].slice(0, -6); ?></td><?
+                    } else if (table[i][j].indexOf("ye_str") > -1) { ?>
+                      <td class="<?=className; ?>" style="text-align: center; background: yellow; text-decoration: line-through; text-decoration-color: red;"><?=table[i][j].slice(0, -6); ?></td><?
+                    } else { ?>
+                      <td class="<?=className; ?>" style="text-align: center;"><?=table[i][j] ?></td><?
+                    }
+                  } else {?>
+                    <td class="<?=className; ?>" style="text-align: center;"><?=table[i][j]; ?></td><?
+                  }
+                }?>
+                </tr><?
+              }?>
+          </table>
         </div>
-        <table class="first_table">
-          <tr>
-            <th>Monday</th>
-            <th>Tuesday</th>
-            <th>Wednesday</th>
-            <th>Thursday</th> 
-            <th>Friday</th>
-            <th>Saturday</th>
-            <th>Sunday</th>
-          </tr>
-          <tr><? var week = getWeek(1);
-            for (var i in week) { ?>
-              <th><?= Utilities.formatDate(week[i], "CST", "MM/dd/YY") ?></th><?
-            } ?>
-          </tr>
-          <tr style="background: lightgray;"><?
-            if (crew == "A_C") { ?>
-              <th>A crew</th>
-              <th>A crew</th>
-              <th>B crew</th>
-              <th>B crew</th>
-              <th>A crew</th>
-              <th>A crew</th>
-              <th>A crew</th> <?
-            } if (crew == "B_D") { ?>
-              <th>B crew</th>
-              <th>B crew</th>
-              <th>A crew</th>
-              <th>A crew</th>
-              <th>B crew</th>
-              <th>B crew</th>
-              <th>B crew</th><?
-            } ?>
-          </tr>
-        </table>
-        <table class="second_table">
-          <tr style="background: lightgray;"><?
-            if (nextCrew == "A_C") { ?>
-              <th>C crew</th>
-              <th>C crew</th>
-              <th>D crew</th>
-              <th>D crew</th>
-              <th>C crew</th>
-              <th>C crew</th>
-              <th>C crew</th><?
-            } else { ?>
-              <th>D crew</th>
-              <th>D crew</th>
-              <th>C crew</th>
-              <th>C crew</th>
-              <th>D crew</th>
-              <th>D crew</th>
-              <th>D crew</th><?
-            } ?>
-          </tr>
-        </table>
+      </div>
+      <div id="rollFedNextWeek" class="modal rollFed fade" role="dialog">
+      	<div class="modal-dialog">
+          <div class="modal-content">
+            <div class="modal-body">
+              <div style="display: flex; flex-direction: column; width: 100%;" align="center">
+                <label style="background: orange; font-size: 25px;">Roll Fed</label>
+                <label style="font-size: 25px;">Week of: <?= Utilities.formatDate(firstOfWeek(8), "CST", "MM/dd/YY") ?></label>
+              </div>
+              <div>
+                <table style="border-collapse: collapse; width: 100%;">
+                  <tr>
+                    <th>Monday</th>	
+                    <th>Tuesday</th>
+                    <th>Wednesday</th>
+                    <th>Thursday</th>	
+                    <th>Friday</th>
+                    <th>Saturday</th>
+                    <th>Sunday</th>
+                  </tr>
+                  <tr><? week = getWeek(8);
+                    for (var i in week) { ?>
+                      <th><?= Utilities.formatDate(week[i], "CST", "MM/dd/YY") ?></th><?
+                    } ?>
+                  </tr>
+                  <tr style="background: lightgray;"><? 
+                    if (nextCrew == "A_C") { ?>
+                      <th>A crew</th>
+                      <th>A crew</th>
+                      <th>B crew</th>
+                      <th>B crew</th>
+                      <th>A crew</th>
+                      <th>A crew</th>
+                      <th>A crew</th>
+                  <? } else { ?>
+                      <th>B crew</th>
+                      <th>B crew</th>
+                      <th>A crew</th>
+                      <th>A crew</th>
+                      <th>B crew</th>
+                      <th>B crew</th>
+                      <th>B crew</th>
+                  <? } ?>
+                  </tr><?
+                    var persons = make_persons(nextCrew, "Roll Fed", week, dataForCurrent, "first");
+                    var table = create_table(persons, firstLength.rollNextAB);
+                    for (var i = 0; i < firstLength.rollNextAB; i++) {?>
+                      <tr><?
+                      for (var j = 0; j < 7; j++) {
+                        var className = makeClassName(i, j, "NextRollFed", crew, nextCrew, next_a_c, next_b_d, "first", firstSchedule);
+                        if (table[i][j]) {
+                          if (table[i][j].indexOf("yellow") > -1) { ?>
+                            <td class="<?=className; ?>" style="text-align: center; background: yellow;"><?=table[i][j].slice(0, -6); ?></td><?  
+                          } else if (table[i][j].indexOf("strike") > -1) { ?>
+                            <td class="<?=className; ?>" style="text-align: center; text-decoration: line-through; text-decoration-color: red;"><?=table[i][j].slice(0, -6); ?></td><?
+                          } else if (table[i][j].indexOf("ye_str") > -1) { ?>
+                            <td class="<?=className; ?>" style="text-align: center; background: yellow; text-decoration: line-through; text-decoration-color: red;"><?=table[i][j].slice(0, -6); ?></td><?
+                          } else { ?>
+                            <td class="<?=className; ?>" style="text-align: center;"><?=table[i][j] ?></td><?
+                          }
+                        } else {?>
+                          <td class="<?=className; ?>" style="text-align: center;"><?=table[i][j]; ?></td><?
+                        }
+                      }?>
+                      </tr><?
+                    }?>
+                </table>
+                <table style=" border-collapse: collapse; width: 100%; margin-top: 8%;">
+                  <tr style="background: lightgray;">
+                    <?if (nextCrew == "A_C") { ?>
+                      <th>C crew</th>
+                      <th>C crew</th>
+                      <th>D crew</th>
+                      <th>D crew</th>
+                      <th>C crew</th>
+                      <th>C crew</th>
+                      <th>C crew</th>
+                    <? } else { ?>
+                      <th>D crew</th>
+                      <th>D crew</th>
+                      <th>C crew</th>
+                      <th>C crew</th>
+                      <th>D crew</th>
+                      <th>D crew</th>
+                      <th>D crew</th>
+                    <? } ?>
+                  </tr><?
+                    var persons = make_persons(nextCrew, "Roll Fed", week, dataForCurrent, "second");
+                    var table = create_table(persons, firstLength.rollNextCD);
+                    for (var i = 0; i < firstLength.rollNextCD; i++) {?>
+                      <tr><?
+                      for (var j = 0; j < 7; j++) {
+                        var className = makeClassName(i, j, "NextRollFed", crew, nextCrew, next_a_c, next_b_d, "second", firstSchedule);
+                        if (table[i][j]) {
+                          if (table[i][j].indexOf("yellow") > -1) { ?>
+                            <td class="<?=className; ?>" style="text-align: center; background: yellow;"><?=table[i][j].slice(0, -6); ?></td><?  
+                          } else if (table[i][j].indexOf("strike") > -1) { ?>
+                            <td class="<?=className; ?>" style="text-align: center; text-decoration: line-through; text-decoration-color: red;"><?=table[i][j].slice(0, -6); ?></td><?
+                          } else if (table[i][j].indexOf("ye_str") > -1) { ?>
+                            <td class="<?=className; ?>" style="text-align: center; background: yellow; text-decoration: line-through; text-decoration-color: red;"><?=table[i][j].slice(0, -6); ?></td><?
+                          } else { ?>
+                            <td class="<?=className; ?>" style="text-align: center;"><?=table[i][j] ?></td><?
+                          }
+                        } else {?>
+                          <td class="<?=className; ?>" style="text-align: center;"><?=table[i][j]; ?></td><?
+                        }
+                      }?>
+                      </tr><?
+                    }?>
+                </table>
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+              </div>
+            </div>
+          </div>
+        </div>
       </div>
     </div>
-
+    <div align="center">
+      <h1>Current Roster - Inline</h1>
+      <div class="button-group">
+        <button data-toggle="modal" data-target="#inlineNextWeek">Next Week</button>
+        <button onclick="htmlToPDF('inline')">Print</button>
+      </div>
+      
+      <div class="window">
+      	<div id="inline">
+          <div style="display: flex; flex-direction: column; width: 100%;" align="center">
+            <label style="background: green; font-size: 25px;">Inline</label>
+            <label style="font-size: 25px;">Week of: <?= Utilities.formatDate(firstOfWeek(1), "CST", "MM/dd/YY") ?></label>
+          </div>
+          <table class="table_group" style="border-collapse: collapse; width: 100%;">
+            <tr>
+              <th>Monday</th>	
+              <th>Tuesday</th>
+              <th>Wednesday</th>
+              <th>Thursday</th>	
+              <th>Friday</th>
+              <th>Saturday</th>
+              <th>Sunday</th>
+            </tr>
+            <tr><? var week = getWeek(1);
+              for (var i in week) { ?>
+                <th><?= Utilities.formatDate(week[i], "CST", "MM/dd/YY") ?></th><?
+              } ?>
+            </tr>
+            <tr style="background: lightgray;">
+            <? if (crew == "A_C") {?>
+                <th>A crew</th>
+                <th>A crew</th>
+                <th>B crew</th>
+                <th>B crew</th>
+                <th>A crew</th>
+                <th>A crew</th>
+                <th>A crew</th>
+            <? } if (crew == "B_D") { ?>
+                <th>B crew</th>
+                <th>B crew</th>
+                <th>A crew</th>
+                <th>A crew</th>
+                <th>B crew</th>
+                <th>B crew</th>
+                <th>B crew</th>
+            <? } ?>
+            </tr><?
+              var persons = make_persons(crew, "Inline", week, dataForCurrent, "first");
+              var table = create_table(persons, firstLength.inCurAB);
+              for (var i = 0; i < firstLength.inCurAB; i++) { ?>
+                <tr><?
+                for (var j = 0; j < 7; j++) {
+                  var className = makeClassName(i, j, "Inline", crew, nextCrew, a_c, b_d, "first", firstSchedule);
+                  if (table[i][j]) {
+                    if (table[i][j].indexOf("yellow") > -1) { ?>
+                      <td class="<?=className; ?>" style="text-align: center; background: yellow;"><?=table[i][j].slice(0, -6); ?></td><?  
+                    } else if (table[i][j].indexOf("strike") > -1) { ?>
+                      <td class="<?=className; ?>" style="text-align: center; text-decoration: line-through; text-decoration-color: red;"><?=table[i][j].slice(0, -6); ?></td><?
+                    } else if (table[i][j].indexOf("ye_str") > -1) { ?>
+                      <td class="<?=className; ?>" style="text-align: center; background: yellow; text-decoration: line-through; text-decoration-color: red;"><?=table[i][j].slice(0, -6); ?></td><?
+                    } else { ?>
+                      <td class="<?=className; ?>" style="text-align: center;"><?=table[i][j] ?></td><?
+                    }
+                  } else {?>
+                    <td class="<?=className; ?>" style="text-align: center;"><?=table[i][j]; ?></td><?
+                  }
+                }?>
+                </tr><?
+              }?>
+          </table>
+          <table class="table_group" style="border-collapse: collapse; width: 100%; margin-top: 8%;">
+            <tr style="background: lightgray;">
+              <? if (crew == "A_C") { ?>
+                <th>C crew</th>
+                <th>C crew</th>
+                <th>D crew</th>
+                <th>D crew</th>
+                <th>C crew</th>
+                <th>C crew</th>
+                <th>C crew</th>
+              <? } if (crew == "B_D") { ?>
+                <th>D crew</th>
+                <th>D crew</th>
+                <th>C crew</th>
+                <th>C crew</th>
+                <th>D crew</th>
+                <th>D crew</th>
+                <th>D crew</th>
+              <? } ?>
+            </tr><?
+              var persons = make_persons(crew, "Inline", week, dataForCurrent, "second");
+              var table = create_table(persons, firstLength.inCurCD);
+              for (var i = 0; i < firstLength.inCurCD; i++) { ?>
+                <tr><?
+                for (var j = 0; j < 7; j++) {
+                  var className = makeClassName(i, j, "Inline", crew, nextCrew, a_c, b_d, "second", firstSchedule);
+                  if (table[i][j]) {
+                    if (table[i][j].indexOf("yellow") > -1) { ?>
+                      <td class="<?=className; ?>" style="text-align: center; background: yellow;"><?=table[i][j].slice(0, -6); ?></td><?  
+                    } else if (table[i][j].indexOf("strike") > -1) { ?>
+                      <td class="<?=className; ?>" style="text-align: center; text-decoration: line-through; text-decoration-color: red;"><?=table[i][j].slice(0, -6); ?></td><?
+                    } else if (table[i][j].indexOf("ye_str") > -1) { ?>
+                      <td class="<?=className; ?>" style="text-align: center; background: yellow; text-decoration: line-through; text-decoration-color: red;"><?=table[i][j].slice(0, -6); ?></td><?
+                    } else { ?>
+                      <td class="<?=className; ?>" style="text-align: center;"><?=table[i][j] ?></td><?
+                    }
+                  } else {?>
+                    <td class="<?=className; ?>" style="text-align: center;"><?=table[i][j]; ?></td><?
+                  }
+                }?>
+                </tr><?
+              }?>
+          </table>
+        </div>
+        <div id="inlineNextWeek" class="modal inline fade" role="dialog">
+          <div class="modal-dialog">
+            <div class="modal-content">
+              <div class="modal-body">
+                <div style="display: flex; flex-direction: column; width: 100%;" align="center">
+                  <label style="background: green; font-size: 25px;">Inline</label>
+                  <label style="font-size: 25px;">Week of: <?= Utilities.formatDate(firstOfWeek(8), "CST", "MM/dd/YY") ?></label>
+                </div>
+                <div>
+                  <table style=" border-collapse: collapse; width: 100%;">
+                    <tr>
+                      <th>Monday</th>	
+                      <th>Tuesday</th>
+                      <th>Wednesday</th>
+                      <th>Thursday</th>	
+                      <th>Friday</th>
+                      <th>Saturday</th>
+                      <th>Sunday</th>
+                    </tr>
+                    <tr><? week = getWeek(8);
+                      for (var i in week) { ?>
+                        <th><?= Utilities.formatDate(week[i], "CST", "MM/dd/YY") ?></th><?
+                      } ?>
+                    </tr>
+                    <tr style="background: lightgray;"><? 
+                      if (nextCrew == "A_C") { ?>
+                        <th>A crew</th>
+                        <th>A crew</th>
+                        <th>B crew</th>
+                        <th>B crew</th>
+                        <th>A crew</th>
+                        <th>A crew</th>
+                        <th>A crew</th>
+                    <? } else { ?>
+                        <th>B crew</th>
+                        <th>B crew</th>
+                        <th>A crew</th>
+                        <th>A crew</th>
+                        <th>B crew</th>
+                        <th>B crew</th>
+                        <th>B crew</th>
+                    <? } ?>
+                    </tr><?
+                      var persons = make_persons(nextCrew, "Inline", week, dataForCurrent, "first");
+                      var table = create_table(persons, firstLength.inNextAB);
+                      for (var i = 0; i < firstLength.inNextAB; i++) {?>
+                        <tr><?
+                        for (var j = 0; j < 7; j++) {
+                          var className = makeClassName(i, j, "NextInline", crew, nextCrew, next_a_c, next_b_d, "first", firstSchedule);
+                          if (table[i][j]) {
+                            if (table[i][j].indexOf("yellow") > -1) { ?>
+                              <td class="<?=className; ?>" style="text-align: center; background: yellow;"><?=table[i][j].slice(0, -6); ?></td><?  
+                            } else if (table[i][j].indexOf("strike") > -1) { ?>
+                              <td class="<?=className; ?>" style="text-align: center; text-decoration: line-through; text-decoration-color: red;"><?=table[i][j].slice(0, -6); ?></td><?
+                            } else if (table[i][j].indexOf("ye_str") > -1) { ?>
+                              <td class="<?=className; ?>" style="text-align: center; background: yellow; text-decoration: line-through; text-decoration-color: red;"><?=table[i][j].slice(0, -6); ?></td><?
+                            } else { ?>
+                              <td class="<?=className; ?>" style="text-align: center;"><?=table[i][j] ?></td><?
+                            }
+                          } else {?>
+                            <td class="<?=className; ?>" style="text-align: center;"><?=table[i][j]; ?></td><?
+                          }
+                        }?>
+                        </tr><?
+                      }?>
+                  </table>
+                  <table style=" border-collapse: collapse; width: 100%; margin-top: 8%;">
+                    <tr style="background: lightgray;">
+                      <? if (nextCrew == "A_C") { ?>
+                        <th>C crew</th>
+                        <th>C crew</th>
+                        <th>D crew</th>
+                        <th>D crew</th>
+                        <th>C crew</th>
+                        <th>C crew</th>
+                        <th>C crew</th>
+                      <? } else { ?>
+                        <th>D crew</th>
+                        <th>D crew</th>
+                        <th>C crew</th>
+                        <th>C crew</th>
+                        <th>D crew</th>
+                        <th>D crew</th>
+                        <th>D crew</th>
+                      <? } ?>
+                    </tr><?
+                      var persons = make_persons(nextCrew, "Inline", week, dataForCurrent, "second");
+                      var table = create_table(persons, firstLength.inNextCD);
+                      for (var i = 0; i < firstLength.inNextCD; i++) {?>
+                        <tr><?
+                        for (var j = 0; j < 7; j++) {
+                          var className = makeClassName(i, j, "NextInline", crew, nextCrew, next_a_c, next_b_d, "second", firstSchedule);
+                          if (table[i][j]) {
+                            if (table[i][j].indexOf("yellow") > -1) { ?>
+                              <td class="<?=className; ?>" style="text-align: center; background: yellow;"><?=table[i][j].slice(0, -6); ?></td><?  
+                            } else if (table[i][j].indexOf("strike") > -1) { ?>
+                              <td class="<?=className; ?>" style="text-align: center; text-decoration: line-through; text-decoration-color: red;"><?=table[i][j].slice(0, -6); ?></td><?
+                            } else if (table[i][j].indexOf("ye_str") > -1) { ?>
+                              <td class="<?=className; ?>" style="text-align: center; background: yellow; text-decoration: line-through; text-decoration-color: red;"><?=table[i][j].slice(0, -6); ?></td><?
+                            } else { ?>
+                              <td class="<?=className; ?>" style="text-align: center;"><?=table[i][j] ?></td><?
+                            }
+                          } else {?>
+                            <td class="<?=className; ?>" style="text-align: center;"><?=table[i][j]; ?></td><?
+                          }
+                        }?>
+                        </tr><?
+                      }?>
+                  </table>
+                  <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                </div>
+              </div>
+            </div>
+          </div>
+      </div>
+      </div>
+    </div>
+    <iframe name="print_frame" width="0" height="0" frameborder="0" src="about:blank"></iframe>
   </body>
+  <script>
+    function htmlToPDF(id) {
+      var htmlToPrint = '' +
+        '<style type="text/css">' +
+        'table th, td {' + 
+        'border: 1px solid black; color: black; padding: 3px; height:25px;' +
+        '}' +
+        'table { width: 100%; }'+
+        'th { width: 14.3%; text-align: center;}'+
+        '</style>';
+      htmlToPrint += document.getElementById(id).outerHTML;
+      window.frames['print_frame'].document.body.innerHTML = htmlToPrint;
+      window.frames["print_frame"].window.focus();
+      window.frames["print_frame"].window.print();
+    }
+  </script>
 </html>
