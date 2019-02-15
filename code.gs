@@ -92,18 +92,18 @@
     if (crew == 'B_D' || nextCrew == 'A_C') {
       if (a_c.indexOf(j) > -1) {
         if (order == 'first') {
-          length = data[j+7][column];
-        }
-        if (order == 'second') {
-          length = data[j+21][column];
-        }
-      }
-      if (b_d.indexOf(j) > -1) {
-        if (order == 'first') {
           length = data[j][column];
         }
         if (order == 'second') {
           length = data[j+14][column];
+        }
+      }
+      if (b_d.indexOf(j) > -1) {
+        if (order == 'first') {
+          length = data[j+7][column];
+        }
+        if (order == 'second') {
+          length = data[j+21][column];
         }
       }
     }
@@ -281,22 +281,22 @@ function downloadData(){
   var activeSpreadsheet = SpreadsheetApp.openById(spreadsheetId);
   var newSheet = activeSpreadsheet.getSheetByName(sheetName);
   
-  var length = get_length(getTotalSlots());
+  var length = get_first_length(getFirstSchedule());
 
-  var rollFedArray = makeArrayFromTable("Roll Fed", length.rollFedCurAB, length.rollFedCurCD);
-  var inlineArray = makeArrayFromTable("Inline", length.inlineCurAB, length.inlineCurCD);
-  var ecoStarArray = makeArrayFromTable("Eco Star", length.ecoStarCurAB, length.ecoStarCurCD);
-  var northPlantArray = makeArrayFromTable("North Plant", length.northPlantCurAB, length.northPlantCurCD);
+  var rollFedArray = makeArrayFromTable("Roll Fed", length.rollCurAB, length.rollCurCD);
+  var inlineArray = makeArrayFromTable("Inline", length.inCurAB, length.inCurCD);
+  // var ecoStarArray = makeArrayFromTable("Eco Star", length.ecoStarCurAB, length.ecoStarCurCD);
+  // var northPlantArray = makeArrayFromTable("North Plant", length.northPlantCurAB, length.northPlantCurCD);
 
-  var rollFedLen = length.rollFedCurAB + length.rollFedCurCD + 4;
-  var inlineLen = length.inlineCurAB + length.inlineCurCD + 4;
-  var ecoStarLen = length.ecoStarCurAB + length.ecoStarCurCD + 4;
-  var northPlantLen = length.northPlantCurAB + length.northPlantCurCD + 4;
+  var rollFedLen = length.rollCurAB + length.rollCurCD + 4;
+  var inlineLen = length.inCurAB + length.inCurCD + 4;
+  // var ecoStarLen = length.ecoStarCurAB + length.ecoStarCurCD + 4;
+  // var northPlantLen = length.northPlantCurAB + length.northPlantCurCD + 4;
   
   var rollFedRange = 'B2:H' + (rollFedLen + 1);
   var inlineRange = 'B'+ (rollFedLen + 2) + ':H' + (rollFedLen + inlineLen + 1);
-  var ecoStarRange = 'B'+ (rollFedLen + inlineLen + 3) + ':H' + (rollFedLen + inlineLen + ecoStarLen + 2);
-  var northPlantRange = 'B'+ (rollFedLen + inlineLen + ecoStarLen + 4) + ':H' + (rollFedLen + inlineLen + ecoStarLen + northPlantLen + 3);
+  // var ecoStarRange = 'B'+ (rollFedLen + inlineLen + 3) + ':H' + (rollFedLen + inlineLen + ecoStarLen + 2);
+  // var northPlantRange = 'B'+ (rollFedLen + inlineLen + ecoStarLen + 4) + ':H' + (rollFedLen + inlineLen + ecoStarLen + northPlantLen + 3);
 
   if (newSheet == null) {
     newSheet = activeSpreadsheet.insertSheet();
@@ -308,11 +308,11 @@ function downloadData(){
     newSheet.getRange('A'+ (rollFedLen + 1)).setValue('Inline');
     newSheet.getRange(inlineRange).setValues(inlineArray);
     //Eco Star
-    newSheet.getRange('A'+ (rollFedLen + inlineLen + 2)).setValue('Eco Star');
-    newSheet.getRange(ecoStarRange).setValues(ecoStarArray);
+    // newSheet.getRange('A'+ (rollFedLen + inlineLen + 2)).setValue('Eco Star');
+    // newSheet.getRange(ecoStarRange).setValues(ecoStarArray);
     //North Plant
-    newSheet.getRange('A'+ (rollFedLen + inlineLen + ecoStarLen + 3)).setValue('North Plant');
-    newSheet.getRange(northPlantRange).setValues(northPlantArray);
+    // newSheet.getRange('A'+ (rollFedLen + inlineLen + ecoStarLen + 3)).setValue('North Plant');
+    // newSheet.getRange(northPlantRange).setValues(northPlantArray);
     return true;
   } else {
     return false;
