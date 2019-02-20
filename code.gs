@@ -1,320 +1,310 @@
-  function doGet() {
-    return HtmlService.createTemplateFromFile('index.html')
-      .evaluate()
-      .setXFrameOptionsMode(HtmlService.XFrameOptionsMode.ALLOWALL);
+function doGet() {
+  return HtmlService.createTemplateFromFile('index.html')
+    .evaluate()
+    .setXFrameOptionsMode(HtmlService.XFrameOptionsMode.ALLOWALL);
+}
+// get data from "Form Responese 1" for New Start Roster table by date
+function getDataSortDate() {
+  return SpreadsheetApp
+    .openById('1-HmBSO0ViOWjC4ttaAxOZ1sygnfWmKvMJBswBRyouQA')
+    .getSheetByName('Form Responses 1')
+    .getRange('A11:K')
+    .sort(7)
+    .getValues();
+}
+// get data for Current Roster Table by alphabet
+function getDataSortName() {
+  return SpreadsheetApp
+    .openById('1-HmBSO0ViOWjC4ttaAxOZ1sygnfWmKvMJBswBRyouQA')
+    .getSheetByName('Form Responses 1')
+    .getRange('A11:K')
+    .sort(3)
+    .getValues();
+}
+function getDataA_C() {
+  return SpreadsheetApp
+    .openById('1-HmBSO0ViOWjC4ttaAxOZ1sygnfWmKvMJBswBRyouQA')
+    .getSheetByName('Internal Dashboard A/C')
+    .getRange(9, 1, 92, 14)
+    .getValues();
+}
+function getDataB_D() {
+  return SpreadsheetApp
+    .openById('1-HmBSO0ViOWjC4ttaAxOZ1sygnfWmKvMJBswBRyouQA')
+    .getSheetByName('Internal Dashboard B/D')
+    .getRange(9, 1, 92, 14)
+    .getValues();
+}
+// determine current week is which crew
+function detectCrew(now) {
+  var first = new Date(now.getFullYear(), 0, 1);
+  var weekNo = Math.ceil( (((now - first) / 86400000) + first.getDay() + 1) / 7 );
+  if (now.getDay() == 0) {
+    weekNo = weekNo - 1;
   }
-
-  function getDataSortDate() {
-    return SpreadsheetApp
-      .openById('1-HmBSO0ViOWjC4ttaAxOZ1sygnfWmKvMJBswBRyouQA')
-      .getSheetByName('Form Responses 1')
-      .getRange('A11:L')
-      .sort(7)
-      .getValues();
+  if (weekNo % 2 == 0) {
+    return "A_C";
+  } else {
+    return "B_D";
   }
-  function getDataSortName() {
-    return SpreadsheetApp
-      .openById('1-HmBSO0ViOWjC4ttaAxOZ1sygnfWmKvMJBswBRyouQA')
-      .getSheetByName('Form Responses 1')
-      .getRange('A11:L')
-      .sort(3)
-      .getValues();
+}
+// get Monday in current week or next week based on param
+function firstOfWeek(diff) {
+  var now = new Date();
+  var today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+  var day = today.getDay();
+  if (day == 0) {
+      day = 7;
   }
-  function getFirstSchedule() {
-    return SpreadsheetApp
-      .openById('1-HmBSO0ViOWjC4ttaAxOZ1sygnfWmKvMJBswBRyouQA')
-      .getSheetByName('Daily Schedule')
-      .getRange(4, 2, 28, 10)
-      .getValues();
+  var monday = new Date(today.setDate(today.getDate() - day + diff));
+  return monday;
+}
+// get Days on current week or next week based on param
+function getWeek(diff) {
+  var curr = new Date();
+  var day = curr.getDay();
+  if (day == 0) {
+      day = 7;
   }
-  function getSecondSchedule() {
-    return SpreadsheetApp
-      .openById('1-HmBSO0ViOWjC4ttaAxOZ1sygnfWmKvMJBswBRyouQA')
-      .getSheetByName('Eco, North & Warehouse Schedule')
-      .getRange(4, 2, 13, 15)
-      .getValues();
+  var first = curr.getDate() - day + diff;
+  var week = [];
+  for (var i = 0; i < 7; i++) {
+    var next = new Date(curr.getTime());
+    next.setDate(first + i);
+    next.setHours(0,0,0,0);
+    week.push(next);
   }
-  function getTotalSlots() {
-    return SpreadsheetApp
-      .openById('1-HmBSO0ViOWjC4ttaAxOZ1sygnfWmKvMJBswBRyouQA')
-      .getSheetByName('Form Responses 1')
-      .getRange(4, 2, 4, 23)
-      .getValues();
-  }
-  function detectCrew(now) {
-    var first = new Date(now.getFullYear(), 0, 1);
-    var weekNo = Math.ceil( (((now - first) / 86400000) + first.getDay() + 1) / 7 );
-    if (now.getDay() == 0) {
-      weekNo = weekNo - 1;
+  return week;
+}
+// determine if a person can be displayed or not
+function filteredPerson(dept, crew, date, data) {
+  var person = [];
+  for (var i = 0; i < data.length; i++) {
+    var start = "";
+    var last = "";
+    var formated_absence = [];
+    if (data[i][6]) {
+      start = new Date(new Date(data[i][6]).getTime() + 2 * 60 * 60 * 1000);
     }
-    if (weekNo % 2 == 0) {
-      return "A_C";
-    } else {
-      return "B_D";
+    if (data[i][9]) {
+      last = new Date(new Date(data[i][9]).getTime() + 2 * 60 * 60 * 1000);
     }
-  }
-  function makeClassName(i, j, dept, crew, nextCrew, a_c, b_d, order, data) {
-    var className = "";
-    var length;
-    var column;
-    switch(dept) {
-      case 'RollFed':
-        column = 7;
-        break;
-      case 'Inline':
-        column = 2;
-        break;
-      case 'NextRollFed':
-        column = 9;
-        break;
-      case 'NextInline':
-        column = 4;
-        break;
-    }
-    if (crew == 'A_C' || nextCrew == 'B_D') {
-      if (a_c.indexOf(j) > -1) {
-        if (order == 'first') {
-          length = data[j][column];
-        }
-        if (order == 'second') {
-          length = data[j+14][column];
-        }
-      }
-      if (b_d.indexOf(j) > -1) {
-        if (order == 'first') {
-          length = data[j+7][column];
-        }
-        if (order == 'second') {
-          length = data[j+21][column];
-        }
-      }
-    }
-    if (crew == 'B_D' || nextCrew == 'A_C') {
-      if (a_c.indexOf(j) > -1) {
-        if (order == 'first') {
-          length = data[j][column];
-        }
-        if (order == 'second') {
-          length = data[j+14][column];
-        }
-      }
-      if (b_d.indexOf(j) > -1) {
-        if (order == 'first') {
-          length = data[j+7][column];
-        }
-        if (order == 'second') {
-          length = data[j+21][column];
-        }
+    if (data[i][10]) {        
+      if (data[i][10].toString().indexOf(';') > -1) {
+        formated_absence = data[i][10];
+      } else {
+        var absence = new Date(new Date(data[i][10]).getTime() + 2 * 60 * 60 * 1000);
+        formated_absence = Utilities.formatDate(absence, "CST", "MM/dd/Y");
       }
     }
-    if (i >= length) {
-      className = "outside";
-    } else {
-      className = "normal";
-    }
-    return className;
-  }
-  function firstOfWeek(diff) {
-    var now = new Date();
-    var today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
-    var day = today.getDay();
-    if (day == 0) {
-        day = 7;
-    }
-    var monday = new Date(today.setDate(today.getDate() - day + diff));
-    return monday;
-  }
-  
-  function getWeek(diff) {
-    var curr = new Date();
-    var day = curr.getDay();
-    if (day == 0) {
-        day = 7;
-    }
-    var first = curr.getDate() - day + diff;
-    var week = [];
-    for (var i = 0; i < 7; i++) {
-      var next = new Date(curr.getTime());
-      next.setDate(first + i);
-      next.setHours(0,0,0,0);
-      week.push(next);
-    }
-    return week;
-  }
-  
-  function filtered_person(dept, crew, date, data) {
-    var person = [];
-    for (var i = 0; i < data.length; i++) {
-      var start = "";
-      var last = "";
-      var formated_absence = [];
-      if (data[i][6]) {
-        start = new Date(new Date(data[i][6]).getTime() + 2 * 60 * 60 * 1000);
-      }
-      if (data[i][9]) {
-        last = new Date(new Date(data[i][9]).getTime() + 2 * 60 * 60 * 1000);
-      }
-      if (data[i][10]) {        
-        if (data[i][10].toString().indexOf(';') > -1) {
-          formated_absence = data[i][10];
+    if (start && data[i][3] == dept && data[i][4] == crew) {
+      if (!last || last > date) {
+        var formated_date = Utilities.formatDate(date, "CST", "MM/dd/Y");
+        if (start < date) {
+          if (formated_absence.indexOf(formated_date) > -1) {
+            person.push(data[i][1] + " " + data[i][2] + 'strike');  
+          } else {
+            person.push(data[i][1] + " " + data[i][2]);
+          }
+        } else if (start > date) {
+          continue;
         } else {
-          var absence = new Date(new Date(data[i][10]).getTime() + 2 * 60 * 60 * 1000);
-          formated_absence = Utilities.formatDate(absence, "CST", "MM/dd/Y");
-        }
-      }
-      if (start && data[i][3] == dept && data[i][4] == crew) {
-        if (data[i][11] == '1' || (data[i][11] == 0 && date < new Date())) {
-          if (!last || last > date) {
-            var formated_date = Utilities.formatDate(date, "CST", "MM/dd/Y");
-            if (start < date) {
-              if (formated_absence.indexOf(formated_date) > -1) {
-                person.push(data[i][1] + " " + data[i][2] + 'strike');  
-              } else {
-                person.push(data[i][1] + " " + data[i][2]);
-              }
-            } else if (start > date) {
-              continue;
-            } else {
-              if (formated_absence && formated_absence.toString().indexOf(formated_date) > -1) {
-                person.push(data[i][1] + " " + data[i][2] + 'ye_str');
-              } else {
-                person.push(data[i][1] + " " + data[i][2] + 'yellow')
-              }
-            }
+          if (formated_absence && formated_absence.toString().indexOf(formated_date) > -1) {
+            person.push(data[i][1] + " " + data[i][2] + 'ye_str');
+          } else {
+            person.push(data[i][1] + " " + data[i][2] + 'yellow')
           }
         }
       }
     }
-    return person;
   }
-  function make_persons(crew, dept, week, data, order) {
-    var persons = [];
-    if (crew == "A_C") {
-      if (order == "first") {
+  return person;
+}
+function makeTable(crew, dept, week, data, order) {
+  var persons = [];
+  if (crew == "A_C") {
+    if (order == "first") {
+      if (dept == 'Roll Fed' || 'Inline') {
         var crews = ["A Crew", "A Crew", "B Crew", "B Crew", "A Crew", "A Crew", "A Crew"];
-      } else {
+      }
+      if (dept == 'Eco Star') {
+        var crews = ["Days", "Days", "Days", "Days", "OFF", "OFF", "OFF"];
+      }
+      if (dept == 'North Plant') {
+        var crews = ["Days", "Days", "Days", "Days", "OFF", "OFF", "OFF"];
+      }
+    } else {
+      if (dept == 'Roll Fed' || 'Inline') {
         var crews = ["C Crew", "C Crew", "D Crew", "D Crew", "C Crew", "C Crew", "C Crew"];
       }
-    }
-    if (crew == "B_D") {
-      if (order == "first") {
-        var crews = ["B Crew", "B Crew", "A Crew", "A Crew", "B Crew", "B Crew", "B Crew"];
-      } else {
-        var crews = ["D Crew", "D Crew", "C Crew", "C Crew", "D Crew", "D Crew", "D Crew"];
+      if (dept == 'Eco Star') {
+        var crews = ["Nights", "Nights", "Nights", "Nights", "OFF", "OFF", "OFF"];
+      }
+      if (dept == 'North Plant') {
+        var crews = ["Nights", "Nights", "Nights", "Nights", "OFF", "OFF", "OFF"];
       }
     }
-    for (var i = 0; i < 7; i++) {
-      persons[i] = filtered_person(dept, crews[i], week[i], data);
-    }
-    return persons;
-  }
-  function get_first_length(firstSchedule) {
-    var length = {};
-    length.inCurAB = Math.max(firstSchedule[0][4], firstSchedule[1][2], firstSchedule[2][2], firstSchedule[3][2], firstSchedule[4][2], firstSchedule[5][2], firstSchedule[6][2], firstSchedule[7][2], firstSchedule[8][2], firstSchedule[9][2], firstSchedule[10][2], firstSchedule[11][2], firstSchedule[12][2], firstSchedule[13][2]);
-    length.inCurCD = Math.max(firstSchedule[14][2], firstSchedule[15][2], firstSchedule[16][2], firstSchedule[17][2], firstSchedule[18][2], firstSchedule[19][2], firstSchedule[20][2], firstSchedule[21][2], firstSchedule[22][2], firstSchedule[23][2], firstSchedule[24][2], firstSchedule[25][2], firstSchedule[26][2], firstSchedule[27][2]);
-
-    length.inNextAB = Math.max(firstSchedule[0][4], firstSchedule[1][4], firstSchedule[2][4], firstSchedule[3][4], firstSchedule[4][4], firstSchedule[5][4], firstSchedule[6][4], firstSchedule[7][4], firstSchedule[8][4], firstSchedule[9][4], firstSchedule[10][4], firstSchedule[11][4], firstSchedule[12][4], firstSchedule[13][4]);
-    length.inNextCD = Math.max(firstSchedule[14][4], firstSchedule[15][4], firstSchedule[16][4], firstSchedule[17][4], firstSchedule[18][4], firstSchedule[19][4], firstSchedule[20][4], firstSchedule[21][4], firstSchedule[22][4], firstSchedule[23][4], firstSchedule[24][4], firstSchedule[25][4], firstSchedule[26][4], firstSchedule[27][4]);
-
-    length.rollCurAB = Math.max(firstSchedule[0][7], firstSchedule[1][7], firstSchedule[2][7], firstSchedule[3][7], firstSchedule[4][7], firstSchedule[5][7], firstSchedule[6][7],firstSchedule[7][7], firstSchedule[8][7], firstSchedule[9][7], firstSchedule[10][7], firstSchedule[11][7], firstSchedule[12][7], firstSchedule[13][7]);
-    length.rollCurCD = Math.max(firstSchedule[14][7], firstSchedule[15][7], firstSchedule[16][7], firstSchedule[17][7], firstSchedule[18][7], firstSchedule[19][7], firstSchedule[20][7], firstSchedule[21][7], firstSchedule[22][7], firstSchedule[23][7], firstSchedule[24][7], firstSchedule[25][7], firstSchedule[26][7], firstSchedule[27][7]);
-
-    length.rollNextAB = Math.max(firstSchedule[0][9], firstSchedule[1][9], firstSchedule[2][9], firstSchedule[3][9], firstSchedule[4][9], firstSchedule[5][9], firstSchedule[6][9],firstSchedule[7][9], firstSchedule[8][9], firstSchedule[9][9], firstSchedule[10][9], firstSchedule[11][9], firstSchedule[12][9], firstSchedule[13][9]);
-    length.rollNextCD = Math.max(firstSchedule[14][9], firstSchedule[15][9], firstSchedule[16][9], firstSchedule[17][9], firstSchedule[18][9], firstSchedule[19][9], firstSchedule[20][9], firstSchedule[21][9], firstSchedule[22][9], firstSchedule[23][9], firstSchedule[24][9], firstSchedule[25][9], firstSchedule[26][9], firstSchedule[27][9]);
-    return length;
-  }
-  function create_table(persons, max_length) {
-    var table = new Array(7);
-    for (var i = 0; i < max_length; i++) {
-      table[i] = new Array();
-    }
-    for (var i=0; i<max_length; i++) {
-      for (var j=0; j<persons.length; j++) {
-        if (persons[j][i]) {
-          table[i][j] = persons[j][i];
-        } else {
-          table[i][j] = null;
-        }
-      }
-    }
-    return table;
-  }
-function makeArrayFromTable(dept, length_AB, length_CD) {
-  var crew = detectCrew(new Date());
-  var week = getWeek(1);
-  var data = getDataSortName();
-  
-  var table_data = [];
-  var week_head = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
-  var date_head = [];
-  for (var i in week) {
-    date_head.push(Utilities.formatDate(week[i], "CST", "MM/dd/YY"));
-  }
-  if (crew == "A_C") {
-    var first_crew_head = ['A Crew', 'A Crew', 'B Crew', 'B Crew', 'A Crew', 'A Crew', 'A Crew'];
-    var second_crew_head = ['C Crew', 'C Crew', 'D Crew', 'D Crew', 'C Crew', 'C Crew', 'C Crew'];
   }
   if (crew == "B_D") {
-    var first_crew_head = ['B Crew', 'B Crew', 'A Crew', 'A Crew', 'B Crew', 'B Crew', 'B Crew'];
-    var second_crew_head = ['C Crew', 'C Crew', 'D Crew', 'D Crew', 'C Crew', 'C Crew', 'C Crew'];
+    if (order == "first") {
+      if (dept == 'Roll Fed' || 'Inline') {
+        var crews = ["B Crew", "B Crew", "A Crew", "A Crew", "B Crew", "B Crew", "B Crew"];
+      }
+      if (dept == 'Eco Star') {
+        var crews = ["Days", "Days", "Days", "OFF", "OFF", "OFF", "OFF"];
+      }
+      if (dept == 'North Plant') {
+        var crews = ["Days", "Days", "Days", "Days", "OFF", "OFF", "OFF"];
+      }
+    } else {
+      if (dept == 'Roll Fed' || 'Inline') {
+        var crews = ["D Crew", "D Crew", "C Crew", "C Crew", "D Crew", "D Crew", "D Crew"];
+      }
+      if (dept == 'Eco Star') {
+        var crews = ["Nights", "Nights", "Nights", "OFF", "OFF", "OFF", "OFF"];
+      }
+      if (dept == 'North Plant') {
+        var crews = ["Nights", "Nights", "Nights", "Nights", "OFF", "OFF", "OFF"];
+      }
+    }
   }
-  
-  var top_persons = make_persons(crew, dept, week, data, 'first');
-  var bottom_persons = make_persons(crew, dept, week, data, 'second');
-  
-  var top_table = create_table(top_persons, length_AB);
-  var bottom_table = create_table(bottom_persons, length_CD);
-  
-  table_data.push(week_head, date_head, first_crew_head);
-  for (var i in top_table) {
-    table_data.push(top_table[i]);
+  for (var i = 0; i < 7; i++) {
+    persons[2*i] = filteredPerson(dept, crews[i], week[i], data);
+    persons[2*i+1] = filteredPerson(dept, crews[i], week[i], data);
   }
-  table_data.push(second_crew_head)
-  for (var i in bottom_table) {
-    table_data.push(bottom_table[i])
+  var table = new Array(8);
+  for (var i = 0; i < 8; i++) {
+    table[i] = new Array();
   }
-  return table_data;
+  for (var i = 0; i < 8; i++) {
+    for (var j = 0; j < 14; j++) {
+      if (persons[j][i]) {
+        table[i][j] = persons[j][i];
+      } else {
+        table[i][j] = null;
+      }
+    }
+  }
+  return table;
 }
-function downloadData(){
-  var spreadsheetId = '1Ojl9dNq24dm6JkgB5GEOVZlsTL7k5LNT2F1FIwDKuJ4';
-  var sheetName = Utilities.formatDate(firstOfWeek(1), "CST", "MM/dd/YY")
-  var activeSpreadsheet = SpreadsheetApp.openById(spreadsheetId);
-  var newSheet = activeSpreadsheet.getSheetByName(sheetName);
-  
-  var length = get_first_length(getFirstSchedule());
-
-  var rollFedArray = makeArrayFromTable("Roll Fed", length.rollCurAB, length.rollCurCD);
-  var inlineArray = makeArrayFromTable("Inline", length.inCurAB, length.inCurCD);
-  // var ecoStarArray = makeArrayFromTable("Eco Star", length.ecoStarCurAB, length.ecoStarCurCD);
-  // var northPlantArray = makeArrayFromTable("North Plant", length.northPlantCurAB, length.northPlantCurCD);
-
-  var rollFedLen = length.rollCurAB + length.rollCurCD + 4;
-  var inlineLen = length.inCurAB + length.inCurCD + 4;
-  // var ecoStarLen = length.ecoStarCurAB + length.ecoStarCurCD + 4;
-  // var northPlantLen = length.northPlantCurAB + length.northPlantCurCD + 4;
-  
-  var rollFedRange = 'B2:H' + (rollFedLen + 1);
-  var inlineRange = 'B'+ (rollFedLen + 2) + ':H' + (rollFedLen + inlineLen + 1);
-  // var ecoStarRange = 'B'+ (rollFedLen + inlineLen + 3) + ':H' + (rollFedLen + inlineLen + ecoStarLen + 2);
-  // var northPlantRange = 'B'+ (rollFedLen + inlineLen + ecoStarLen + 4) + ':H' + (rollFedLen + inlineLen + ecoStarLen + northPlantLen + 3);
-
-  if (newSheet == null) {
-    newSheet = activeSpreadsheet.insertSheet();
-    newSheet.setName(sheetName);
-    //RollFed
-    newSheet.getRange('A1').setValue('RollFed');
-    newSheet.getRange(rollFedRange).setValues(rollFedArray);
-    //Inline
-    newSheet.getRange('A'+ (rollFedLen + 1)).setValue('Inline');
-    newSheet.getRange(inlineRange).setValues(inlineArray);
-    //Eco Star
-    // newSheet.getRange('A'+ (rollFedLen + inlineLen + 2)).setValue('Eco Star');
-    // newSheet.getRange(ecoStarRange).setValues(ecoStarArray);
-    //North Plant
-    // newSheet.getRange('A'+ (rollFedLen + inlineLen + ecoStarLen + 3)).setValue('North Plant');
-    // newSheet.getRange(northPlantRange).setValues(northPlantArray);
-    return true;
-  } else {
-    return false;
+function insertTitle(activeSheet, color, titleName) {
+  activeSheet.getRange('A2').setBackground(color);
+  activeSheet.getRange('A2').setValue(titleName);
+}
+function insertDate(activeSheet, row, data) {
+  for (var i in row) {
+    activeSheet.getRange('A'+row[i]).setValue([data[0]]);
+    activeSheet.getRange('C'+row[i]).setValue([data[1]]);
+    activeSheet.getRange('E'+row[i]).setValue([data[2]]);
+    activeSheet.getRange('G'+row[i]).setValue([data[3]]);
+    activeSheet.getRange('I'+row[i]).setValue([data[4]]);
+    activeSheet.getRange('K'+row[i]).setValue([data[5]]);
+    activeSheet.getRange('M'+row[i]).setValue([data[6]]);
   }
+}
+// it should be run once per week
+function insertDataToSheet() {
+  var spreadSheetId = '1-HmBSO0ViOWjC4ttaAxOZ1sygnfWmKvMJBswBRyouQA';
+  var sheetNameA_C = 'Internal Dashboard A/C';
+  var sheetNameB_D = 'Internal Dashboard B/D';
+  var currentWeek = getWeek(1);
+  var nextWeek = getWeek(8);
+  var formatDate = [];
+  var currentFormatDate = [];
+  var nextFormatDate = [];
+  for (var i in currentWeek) {
+    currentFormatDate.push(Utilities.formatDate(currentWeek[i], "CST", "MM/dd/Y"));
+  }
+  for (var i in nextWeek) {
+    nextFormatDate.push(Utilities.formatDate(nextWeek[i], "CST", "MM/dd/Y"));
+  }
+  var crew = detectCrew(new Date());
+  if (crew == 'A_C') {
+    var colorA_C = '#00FF00'; //green
+    var colorB_D = '#FF0000'; //red
+
+    var titleA_C = 'CURRENT';
+    var titleB_D = 'NEXT';
+
+    var formatDateA_C = currentFormatDate;
+    var formatDateB_D = nextFormatDate;
+
+    var weekA_C = currentWeek;
+    var weekB_D = nextWeek;
+  }
+  if (crew == 'B_D') {
+    var colorA_C = '#FF0000'; //red
+    var colorB_D = '#00FF00'; //green
+
+    var titleA_C = 'NEXT';
+    var titleB_D = 'CURRENT';
+
+    var formatDateA_C = nextFormatDate;
+    var formatDateB_D = currentFormatDate;
+
+    var weekA_C = nextWeek;
+    var weekB_D = currentWeek;
+  }
+  var sourceData = getDataSortName();
+  // A/C Roll Fed
+  var firstRollA_C = makeTable('A_C', 'Roll Fed', weekA_C, sourceData, 'first');
+  var secondRollA_C = makeTable('A_C', 'Roll Fed', weekA_C, sourceData, 'second');
+  // A/C Inline
+  var firstInA_C = makeTable('A_C', 'Inline', weekA_C, sourceData, 'first');
+  var secondInA_C = makeTable('A_C', 'Inline', weekA_C, sourceData, 'second');
+  // A/C Eco Star
+  var firstEcoA_C = makeTable('A_C', 'Eco Star', weekA_C, sourceData, 'first');
+  var secondEcoA_C = makeTable('A_C', 'Eco Star', weekA_C, sourceData, 'second');
+  // A/C North Plant
+  var firstNorthA_C = makeTable('A_C', 'North Plant', weekA_C, sourceData, 'first');
+  var secondNorthA_C = makeTable('A_C', 'North Plant', weekA_C, sourceData, 'second');
+
+  // B/D Roll Fed
+  var firstRollB_D = makeTable('B_D', 'Roll Fed', weekB_D, sourceData, 'first');
+  var secondRollB_D = makeTable('B_D', 'Roll Fed', weekB_D, sourceData, 'second');
+  // B/D Inline
+  var firstInB_D = makeTable('B_D', 'Inline', weekB_D, sourceData, 'first');
+  var secondInB_D = makeTable('B_D', 'Inline', weekB_D, sourceData, 'second');
+  // B/D Eco Star
+  var firstEcoB_D = makeTable('B_D', 'Eco Star', weekB_D, sourceData, 'first');
+  var secondEcoB_D = makeTable('B_D', 'Eco Star', weekB_D, sourceData, 'second');
+  // B/D North Plant
+  var firstNorthB_D = makeTable('B_D', 'North Plant', weekB_D, sourceData, 'first');
+  var secondNorthB_D = makeTable('B_D', 'North Plant', weekB_D, sourceData, 'second');
+  
+  
+  
+  var activeSpreadsheet = SpreadsheetApp.openById(spreadSheetId);
+  var activeSheetA_C = activeSpreadsheet.getSheetByName(sheetNameA_C);
+  var activeSheetB_D = activeSpreadsheet.getSheetByName(sheetNameB_D);
+  // insert data to A/C
+  insertTitle(activeSheetA_C, colorA_C, titleA_C);
+  insertDate(activeSheetA_C, [6, 31, 56, 80], formatDateA_C);
+
+  activeSheetA_C.getRange('A9:N16').setValues(firstRollA_C);
+  activeSheetA_C.getRange('A19:N26').setValues(secondRollA_C);
+
+  activeSheetA_C.getRange('A34:N41').setValues(firstInA_C);
+  activeSheetA_C.getRange('A44:N51').setValues(secondInA_C);
+
+  activeSheetA_C.getRange('A59:N66').setValues(firstEcoA_C);
+  activeSheetA_C.getRange('A68:N75').setValues(secondEcoA_C);
+
+  activeSheetA_C.getRange('A83:N90').setValues(firstNorthA_C);
+  activeSheetA_C.getRange('A93:N100').setValues(secondNorthA_C);
+
+  // insert data to B/D
+  insertTitle(activeSheetB_D, colorB_D, titleB_D);
+  insertDate(activeSheetB_D, [6, 31, 56, 80], formatDateB_D);
+  activeSheetB_D.getRange('A9:N16').setValues(firstRollB_D);
+  activeSheetB_D.getRange('A19:N26').setValues(secondRollB_D);
+  
+  activeSheetB_D.getRange('A34:N41').setValues(firstInB_D);
+  activeSheetB_D.getRange('A44:N51').setValues(secondInB_D);
+
+  activeSheetB_D.getRange('A59:N66').setValues(firstEcoB_D);
+  activeSheetB_D.getRange('A68:N75').setValues(secondEcoB_D);
+
+  activeSheetB_D.getRange('A83:N90').setValues(firstNorthB_D);
+  activeSheetB_D.getRange('A93:N100').setValues(secondNorthB_D);
 }
