@@ -25,14 +25,14 @@ function getDataA_C() {
   return SpreadsheetApp
     .openById('1-HmBSO0ViOWjC4ttaAxOZ1sygnfWmKvMJBswBRyouQA')
     .getSheetByName('Internal Dashboard A/C')
-    .getRange(9, 1, 92, 14)
+    .getRange(1, 1, 117, 14)
     .getValues();
 }
 function getDataB_D() {
   return SpreadsheetApp
     .openById('1-HmBSO0ViOWjC4ttaAxOZ1sygnfWmKvMJBswBRyouQA')
     .getSheetByName('Internal Dashboard B/D')
-    .getRange(9, 1, 92, 14)
+    .getRange(1, 1, 117, 14)
     .getValues();
 }
 // determine current week is which crew
@@ -102,7 +102,7 @@ function filteredPerson(dept, crew, date, data) {
         var formated_date = Utilities.formatDate(date, "CST", "MM/dd/Y");
         if (start < date) {
           if (formated_absence.indexOf(formated_date) > -1) {
-            person.push(data[i][1] + " " + data[i][2] + 'strike');  
+            person.push(data[i][1] + " " + data[i][2] + '_A');  
           } else {
             person.push(data[i][1] + " " + data[i][2]);
           }
@@ -110,9 +110,9 @@ function filteredPerson(dept, crew, date, data) {
           continue;
         } else {
           if (formated_absence && formated_absence.toString().indexOf(formated_date) > -1) {
-            person.push(data[i][1] + " " + data[i][2] + 'ye_str');
+            person.push(data[i][1] + " " + data[i][2] + '_B');
           } else {
-            person.push(data[i][1] + " " + data[i][2] + 'yellow')
+            person.push(data[i][1] + " " + data[i][2] + '_S');
           }
         }
       }
@@ -120,7 +120,7 @@ function filteredPerson(dept, crew, date, data) {
   }
   return person;
 }
-function makeTable(crew, dept, week, data, order) {
+function makePersons(crew, dept, week, data, order) {
   var persons = [];
   if (crew == "A_C") {
     if (order == "first") {
@@ -169,23 +169,9 @@ function makeTable(crew, dept, week, data, order) {
     }
   }
   for (var i = 0; i < 7; i++) {
-    persons[2*i] = filteredPerson(dept, crews[i], week[i], data);
-    persons[2*i+1] = filteredPerson(dept, crews[i], week[i], data);
+    persons[i] = filteredPerson(dept, crews[i], week[i], data);
   }
-  var table = new Array(8);
-  for (var i = 0; i < 8; i++) {
-    table[i] = new Array();
-  }
-  for (var i = 0; i < 8; i++) {
-    for (var j = 0; j < 14; j++) {
-      if (persons[j][i]) {
-        table[i][j] = persons[j][i];
-      } else {
-        table[i][j] = null;
-      }
-    }
-  }
-  return table;
+  return persons;
 }
 function insertTitle(activeSheet, color, titleName) {
   activeSheet.getRange('A2').setBackground(color);
@@ -202,6 +188,65 @@ function insertDate(activeSheet, row, data) {
     activeSheet.getRange('M'+row[i]).setValue([data[6]]);
   }
 }
+function insertData(activeSheet, ref, data) {
+  var row;
+  switch (ref) {
+    case 'firstRollA_C':
+      row = 9;
+      break;
+    case 'secondRollA_C':
+      row = 21;
+      break;
+    case 'firstInA_C':
+      row = 38;
+      break;
+    case 'secondInA_C':
+      row = 50;
+      break;
+    case 'firstEcoA_C':
+      row = 67;
+      break;
+    case 'secondEcoA_C':
+      row = 79;
+      break;
+    case 'firstNorthA_C':
+      row = 96;
+      break;
+    case 'secondNorthA_C':
+      row = 108;
+      break;
+    
+    case 'firstRollB_D':
+      row = 9;
+      break;
+    case 'secondRollB_D':
+      row = 21;
+      break;
+    case 'firstInB_D':
+      row = 38;
+      break;
+    case 'secondInB_D':
+      row = 50;
+      break;
+    case 'firstEcoB_D':
+      row = 67;
+      break;
+    case 'secondEcoB_D':
+      row = 79;
+      break;
+    case 'firstNorthB_D':
+      row = 96;
+      break;
+    case 'secondNorthB_D':
+      row = 108;
+      break;
+  }
+  for (var i = 0; i < 7; i++) {
+    for (var j = 0; j < data[i].length; j++) {
+      activeSheet.getRange(row+j, 2*i+1).setValue(data[i][j]);
+    }
+  }
+}
 // it should be run once per week
 function insertDataToSheet() {
   var spreadSheetId = '1-HmBSO0ViOWjC4ttaAxOZ1sygnfWmKvMJBswBRyouQA';
@@ -209,7 +254,6 @@ function insertDataToSheet() {
   var sheetNameB_D = 'Internal Dashboard B/D';
   var currentWeek = getWeek(1);
   var nextWeek = getWeek(8);
-  var formatDate = [];
   var currentFormatDate = [];
   var nextFormatDate = [];
   for (var i in currentWeek) {
@@ -247,64 +291,138 @@ function insertDataToSheet() {
   }
   var sourceData = getDataSortName();
   // A/C Roll Fed
-  var firstRollA_C = makeTable('A_C', 'Roll Fed', weekA_C, sourceData, 'first');
-  var secondRollA_C = makeTable('A_C', 'Roll Fed', weekA_C, sourceData, 'second');
+  var firstRollA_C = makePersons('A_C', 'Roll Fed', weekA_C, sourceData, 'first');
+  var secondRollA_C = makePersons('A_C', 'Roll Fed', weekA_C, sourceData, 'second');
   // A/C Inline
-  var firstInA_C = makeTable('A_C', 'Inline', weekA_C, sourceData, 'first');
-  var secondInA_C = makeTable('A_C', 'Inline', weekA_C, sourceData, 'second');
+  var firstInA_C = makePersons('A_C', 'Inline', weekA_C, sourceData, 'first');
+  var secondInA_C = makePersons('A_C', 'Inline', weekA_C, sourceData, 'second');
   // A/C Eco Star
-  var firstEcoA_C = makeTable('A_C', 'Eco Star', weekA_C, sourceData, 'first');
-  var secondEcoA_C = makeTable('A_C', 'Eco Star', weekA_C, sourceData, 'second');
+  var firstEcoA_C = makePersons('A_C', 'Eco Star', weekA_C, sourceData, 'first');
+  var secondEcoA_C = makePersons('A_C', 'Eco Star', weekA_C, sourceData, 'second');
   // A/C North Plant
-  var firstNorthA_C = makeTable('A_C', 'North Plant', weekA_C, sourceData, 'first');
-  var secondNorthA_C = makeTable('A_C', 'North Plant', weekA_C, sourceData, 'second');
+  var firstNorthA_C = makePersons('A_C', 'North Plant', weekA_C, sourceData, 'first');
+  var secondNorthA_C = makePersons('A_C', 'North Plant', weekA_C, sourceData, 'second');
 
   // B/D Roll Fed
-  var firstRollB_D = makeTable('B_D', 'Roll Fed', weekB_D, sourceData, 'first');
-  var secondRollB_D = makeTable('B_D', 'Roll Fed', weekB_D, sourceData, 'second');
+  var firstRollB_D = makePersons('B_D', 'Roll Fed', weekB_D, sourceData, 'first');
+  var secondRollB_D = makePersons('B_D', 'Roll Fed', weekB_D, sourceData, 'second');
   // B/D Inline
-  var firstInB_D = makeTable('B_D', 'Inline', weekB_D, sourceData, 'first');
-  var secondInB_D = makeTable('B_D', 'Inline', weekB_D, sourceData, 'second');
+  var firstInB_D = makePersons('B_D', 'Inline', weekB_D, sourceData, 'first');
+  var secondInB_D = makePersons('B_D', 'Inline', weekB_D, sourceData, 'second');
   // B/D Eco Star
-  var firstEcoB_D = makeTable('B_D', 'Eco Star', weekB_D, sourceData, 'first');
-  var secondEcoB_D = makeTable('B_D', 'Eco Star', weekB_D, sourceData, 'second');
+  var firstEcoB_D = makePersons('B_D', 'Eco Star', weekB_D, sourceData, 'first');
+  var secondEcoB_D = makePersons('B_D', 'Eco Star', weekB_D, sourceData, 'second');
   // B/D North Plant
-  var firstNorthB_D = makeTable('B_D', 'North Plant', weekB_D, sourceData, 'first');
-  var secondNorthB_D = makeTable('B_D', 'North Plant', weekB_D, sourceData, 'second');
-  
-  
+  var firstNorthB_D = makePersons('B_D', 'North Plant', weekB_D, sourceData, 'first');
+  var secondNorthB_D = makePersons('B_D', 'North Plant', weekB_D, sourceData, 'second');
   
   var activeSpreadsheet = SpreadsheetApp.openById(spreadSheetId);
   var activeSheetA_C = activeSpreadsheet.getSheetByName(sheetNameA_C);
   var activeSheetB_D = activeSpreadsheet.getSheetByName(sheetNameB_D);
-  // insert data to A/C
+  // insert title/date/color to A/C
   insertTitle(activeSheetA_C, colorA_C, titleA_C);
-  insertDate(activeSheetA_C, [6, 31, 56, 80], formatDateA_C);
+  insertDate(activeSheetA_C, [6, 35, 64, 93], formatDateA_C);
+  // insert data to A/C
+  insertData(activeSheetA_C, 'firstRollA_C', firstRollA_C);
+  insertData(activeSheetA_C, 'secondRollA_C', secondRollA_C);
+  insertData(activeSheetA_C, 'firstInA_C', firstInA_C);
+  insertData(activeSheetA_C, 'secondInA_C', secondInA_C);
+  insertData(activeSheetA_C, 'firstEcoA_C', firstEcoA_C);
+  insertData(activeSheetA_C, 'secondEcoA_C', secondEcoA_C);
+  insertData(activeSheetA_C, 'firstNorthA_C', firstNorthA_C);
+  insertData(activeSheetA_C, 'secondNorthA_C', secondNorthA_C);
 
-  activeSheetA_C.getRange('A9:N16').setValues(firstRollA_C);
-  activeSheetA_C.getRange('A19:N26').setValues(secondRollA_C);
-
-  activeSheetA_C.getRange('A34:N41').setValues(firstInA_C);
-  activeSheetA_C.getRange('A44:N51').setValues(secondInA_C);
-
-  activeSheetA_C.getRange('A59:N66').setValues(firstEcoA_C);
-  activeSheetA_C.getRange('A68:N75').setValues(secondEcoA_C);
-
-  activeSheetA_C.getRange('A83:N90').setValues(firstNorthA_C);
-  activeSheetA_C.getRange('A93:N100').setValues(secondNorthA_C);
-
-  // insert data to B/D
+  // insert title/date/color to B/D
   insertTitle(activeSheetB_D, colorB_D, titleB_D);
-  insertDate(activeSheetB_D, [6, 31, 56, 80], formatDateB_D);
-  activeSheetB_D.getRange('A9:N16').setValues(firstRollB_D);
-  activeSheetB_D.getRange('A19:N26').setValues(secondRollB_D);
+  insertDate(activeSheetB_D, [6, 35, 64, 93], formatDateB_D);
+  // insert data to B/D
+  insertData(activeSheetB_D, 'firstRollB_D', firstRollB_D);
+  insertData(activeSheetB_D, 'secondRollB_D', secondRollB_D);
+  insertData(activeSheetB_D, 'firstInB_D', firstInB_D);
+  insertData(activeSheetB_D, 'secondInB_D', secondInB_D);
+  insertData(activeSheetB_D, 'firstEcoB_D', firstEcoB_D);
+  insertData(activeSheetB_D, 'secondEcoB_D', secondEcoB_D);
+  insertData(activeSheetB_D, 'firstNorthB_D', firstNorthB_D);
+  insertData(activeSheetB_D, 'secondNorthB_D', secondNorthB_D);
+}
+function getMaxLength(data, ref) {
+  var row;
+  var maxLength;
+  switch (ref) {
+    case 'rollFirst':
+      row = 8;
+      break;
+    case 'rollSecond':
+      row = 20;
+      break;
+    case 'inFirst':
+      row = 37;
+      break;
+    case 'inSecond':
+      row = 49;
+      break;
+    case 'ecoFirst':
+      row = 66;
+      break;
+    case 'ecoSecond':
+      row = 78;
+      break;
+    case 'northFirst':
+      row = 95;
+      break;
+    case 'northSecond':
+      row = 107;
+      break;
+  }
+  maxLength = Math.max(data[row-1][1], data[row-1][3], data[row-1][5], data[row-1][7], data[row-1][9], data[row-1][11], data[row-1][13]);
+  return [row, maxLength];
+}
+function makeClassName(i, j, ref, data){
+  var row_length = getMaxLength(data, ref);
+  var rowNum = row_length[0];
+  var length = data[rowNum-1][2*j+1];
+  if (i >= length) {
+    return 'outside';
+  } else {
+    return 'normal';
+  }
+}
+function makeTableFromInternal(data, ref) {
+  // get maxLength
+  var row_length = getMaxLength(data, ref);
+  var rowNum = row_length[0];
+  var maxLength = row_length[1];
   
-  activeSheetB_D.getRange('A34:N41').setValues(firstInB_D);
-  activeSheetB_D.getRange('A44:N51').setValues(secondInB_D);
-
-  activeSheetB_D.getRange('A59:N66').setValues(firstEcoB_D);
-  activeSheetB_D.getRange('A68:N75').setValues(secondEcoB_D);
-
-  activeSheetB_D.getRange('A83:N90').setValues(firstNorthB_D);
-  activeSheetB_D.getRange('A93:N100').setValues(secondNorthB_D);
+  // define table maxLength * 7
+  var table = [];
+  for (var i = 0; i < maxLength; i++) {
+    table[i] = [];
+  }
+  // insert data from sheet to table
+  for (var i = 0; i < maxLength; i++) {
+    for (var j = 0; j < 7; j++) {
+      if (data[i+rowNum][2*j+1] && data[i+rowNum][2*j+1] != '-') {
+        table[i][j] = data[i+rowNum][2*j+1];
+      } else {
+        table[i][j] = null;
+      }
+    }
+  }
+  // remove null in table
+  var columns = [];
+  for (var i = 0; i < 7; i++) {
+    columns[i] = [];
+    for (j = 0; j < table.length; j++) {
+      if (table[j][i]) columns[i].push(table[j][i]);
+    }
+  }
+  var new_table = [];
+  for (var i = 0; i < table.length; i++) {
+    new_table[i] = [];
+    for (j = 0; j < 7; j++) {
+      if (columns[j][i]) new_table[i][j] = columns[j][i];
+      else new_table[i][j] = null;
+    }
+  }
+  return new_table;
 }
