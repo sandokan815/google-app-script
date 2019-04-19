@@ -20,20 +20,6 @@
       .sort(3)
       .getValues();
   }
-  function getFirstSchedule() {
-    return SpreadsheetApp
-      .openById('1-HmBSO0ViOWjC4ttaAxOZ1sygnfWmKvMJBswBRyouQA')
-      .getSheetByName('Daily Schedule')
-      .getRange(4, 2, 28, 10)
-      .getValues();
-  }
-  function getSecondSchedule() {
-    return SpreadsheetApp
-      .openById('1-HmBSO0ViOWjC4ttaAxOZ1sygnfWmKvMJBswBRyouQA')
-      .getSheetByName('Eco, North & Warehouse Schedule')
-      .getRange(4, 2, 13, 15)
-      .getValues();
-  }
   function getTotalSlots() {
     return SpreadsheetApp
       .openById('1-HmBSO0ViOWjC4ttaAxOZ1sygnfWmKvMJBswBRyouQA')
@@ -172,20 +158,28 @@
     }
     return persons;
   }
-  function get_first_length(firstSchedule) {
+  function get_length(totalSlots) {
     var length = {};
-    length.inCurAB = Math.max(firstSchedule[0][4], firstSchedule[1][2], firstSchedule[2][2], firstSchedule[3][2], firstSchedule[4][2], firstSchedule[5][2], firstSchedule[6][2], firstSchedule[7][2], firstSchedule[8][2], firstSchedule[9][2], firstSchedule[10][2], firstSchedule[11][2], firstSchedule[12][2], firstSchedule[13][2]);
-    length.inCurCD = Math.max(firstSchedule[14][2], firstSchedule[15][2], firstSchedule[16][2], firstSchedule[17][2], firstSchedule[18][2], firstSchedule[19][2], firstSchedule[20][2], firstSchedule[21][2], firstSchedule[22][2], firstSchedule[23][2], firstSchedule[24][2], firstSchedule[25][2], firstSchedule[26][2], firstSchedule[27][2]);
+    length.rollFedCurAB = Math.max(totalSlots[0][9], totalSlots[1][9]);
+    length.rollFedCurCD = Math.max(totalSlots[2][9], totalSlots[3][9]);
+    length.rollFedNextAB = Math.max(totalSlots[0][11], totalSlots[1][11]);
+    length.rollFedNextCD = Math.max(totalSlots[2][11], totalSlots[3][11]);
 
-    length.inNextAB = Math.max(firstSchedule[0][4], firstSchedule[1][4], firstSchedule[2][4], firstSchedule[3][4], firstSchedule[4][4], firstSchedule[5][4], firstSchedule[6][4], firstSchedule[7][4], firstSchedule[8][4], firstSchedule[9][4], firstSchedule[10][4], firstSchedule[11][4], firstSchedule[12][4], firstSchedule[13][4]);
-    length.inNextCD = Math.max(firstSchedule[14][4], firstSchedule[15][4], firstSchedule[16][4], firstSchedule[17][4], firstSchedule[18][4], firstSchedule[19][4], firstSchedule[20][4], firstSchedule[21][4], firstSchedule[22][4], firstSchedule[23][4], firstSchedule[24][4], firstSchedule[25][4], firstSchedule[26][4], firstSchedule[27][4]);
+    length.inlineCurAB = Math.max(totalSlots[0][2], totalSlots[1][2]);
+    length.inlineCurCD = Math.max(totalSlots[2][2], totalSlots[3][2]);
+    length.inlineNextAB = Math.max(totalSlots[0][4], totalSlots[1][4]);
+    length.inlineNextCD = Math.max(totalSlots[2][4], totalSlots[3][4]);
 
-    length.rollCurAB = Math.max(firstSchedule[0][7], firstSchedule[1][7], firstSchedule[2][7], firstSchedule[3][7], firstSchedule[4][7], firstSchedule[5][7], firstSchedule[6][7],firstSchedule[7][7], firstSchedule[8][7], firstSchedule[9][7], firstSchedule[10][7], firstSchedule[11][7], firstSchedule[12][7], firstSchedule[13][7]);
-    length.rollCurCD = Math.max(firstSchedule[14][7], firstSchedule[15][7], firstSchedule[16][7], firstSchedule[17][7], firstSchedule[18][7], firstSchedule[19][7], firstSchedule[20][7], firstSchedule[21][7], firstSchedule[22][7], firstSchedule[23][7], firstSchedule[24][7], firstSchedule[25][7], firstSchedule[26][7], firstSchedule[27][7]);
+    length.ecoStarCurAB = Math.max(totalSlots[0][14], totalSlots[1][14]);
+    length.ecoStarCurCD = Math.max(totalSlots[2][14], totalSlots[3][14]);
+    length.ecoStarNextAB = Math.max(totalSlots[0][16], totalSlots[1][16]);
+    length.ecoStarNextCD = Math.max(totalSlots[2][16], totalSlots[3][16]);
 
-    length.rollNextAB = Math.max(firstSchedule[0][9], firstSchedule[1][9], firstSchedule[2][9], firstSchedule[3][9], firstSchedule[4][9], firstSchedule[5][9], firstSchedule[6][9],firstSchedule[7][9], firstSchedule[8][9], firstSchedule[9][9], firstSchedule[10][9], firstSchedule[11][9], firstSchedule[12][9], firstSchedule[13][9]);
-    length.rollNextCD = Math.max(firstSchedule[14][9], firstSchedule[15][9], firstSchedule[16][9], firstSchedule[17][9], firstSchedule[18][9], firstSchedule[19][9], firstSchedule[20][9], firstSchedule[21][9], firstSchedule[22][9], firstSchedule[23][9], firstSchedule[24][9], firstSchedule[25][9], firstSchedule[26][9], firstSchedule[27][9]);
-    Logger.log(length);
+    length.northPlantCurAB = Math.max(totalSlots[0][19], totalSlots[1][19]);
+    length.northPlantCurCD = Math.max(totalSlots[2][19], totalSlots[3][19]);
+    length.northPlantNextAB = Math.max(totalSlots[0][21], totalSlots[1][21]);
+    length.northPlantNextCD = Math.max(totalSlots[2][21], totalSlots[3][21]);
+
     return length;
   }
   function create_table(persons, max_length) {
